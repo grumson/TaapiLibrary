@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaapiLibrary.Contracts.Response;
-public class TaapiBulkDataResponse {
+namespace TaapiLibrary.Contracts.Response.Bulk;
+public class TaapiBulkDataResponse
+{
 
     public string id { get; set; } = string.Empty;
     public string indicator { get; set; } = string.Empty;

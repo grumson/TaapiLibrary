@@ -6,7 +6,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using TaapiLibrary.Contracts.Requests;
-using TaapiLibrary.Contracts.Response;
+using TaapiLibrary.Contracts.Response.Bulk;
+using TaapiLibrary.Enums;
 using TaapiLibrary.Exceptions;
 
 namespace TaapiLibrary;
@@ -34,9 +35,29 @@ public class TaapiClient {
 
     #region *** PUBLIC METHODS ***
 
- 
-    // Get Bulk Indicators
-    public async Task<List<TaapiBulkResponse>> GetBulkIndicatorsAsync(TaapiBulkRequest requests) {
+    // Get Indicator directly
+    public async Task<T> GetIndicator<T>(string apiKey, string symbol, TaapiExchange exchange, TaapiCandlesInterval candlesInterval, TaapiIndicatorPropertiesRequest directParametersRequest ) {
+
+        // Set the Mandatory Parameters
+        var parametersMandatory = $"exchange={exchange.GetDescription()}&symbol={symbol}&interval={candlesInterval.GetDescription()}";
+
+        // Set the Optional Parameters
+        var parametersOptional = $"&backtrack={directParametersRequest.Backtrack}&gaps={directParametersRequest.Gaps}&period={directParametersRequest.Period}&stddev={directParametersRequest.StdDev}&multiplier={directParametersRequest.Multiplier}&optInFastPeriod={directParametersRequest.OptInFastPeriod}&optInSlowPeriod={directParametersRequest.OptInSlowPeriod}&optInSignalPeriod={directParametersRequest.OptInSignalPeriod}&kPeriod={directParametersRequest.KPeriod}&dPeriod={directParametersRequest.DPeriod}";
+
+        // create the URL
+        var url = $"{_baseUrl}/{directParametersRequest.Indicator}?secret={apiKey}&{parametersMandatory}&{parametersOptional}";
+
+        // Send the request
+        var response = await _httpClient.GetAsync(url);
+        response.EnsureSuccessStatusCode();
+        var jsonString = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<T>(jsonString);
+
+    }//end GetIndicator()
+
+
+    // Post Bulk Indicators
+    public async Task<List<TaapiBulkResponse>> PostBulkIndicatorsAsync(TaapiBulkRequest requests) {
 
         // Set the URL
         var url = $"{_baseUrl}/bulk";
@@ -116,7 +137,13 @@ public class TaapiClient {
         }
 
 
-    }//end GetBulkIndicatorsAsync()
+    }//end PostBulkIndicatorsAsync()
+
+    #endregion
+
+
+
+    #region *** PRIVATE METHODS ***
 
     #endregion
 

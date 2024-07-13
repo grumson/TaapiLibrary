@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TaapiLibrary.Contracts.Response;
-public class TaapiBulkDataIndicatorResponse {
+namespace TaapiLibrary.Contracts.Response.Bulk;
+public class TaapiBulkDataIndicatorResponse
+{
 
     public int? backtrack { get; set; }
 

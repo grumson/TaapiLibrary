@@ -3,7 +3,8 @@ using TaapiLibrary.Enums;
 
 
 namespace TaapiLibrary.Contracts.Requests;
-public class TaapiIndicatorRequest {
+public class TaapiIndicatorPropertiesRequest
+{
 
 
     #region *** PROPERTIES ***
@@ -55,7 +56,7 @@ public class TaapiIndicatorRequest {
     public int? KPeriod { get; private set; }
 
     [JsonProperty("dPeriod")]
-    public int? DPeriod { get;  private set; }
+    public int? DPeriod { get; private set; }
 
     [JsonProperty("kSmooth")]
     public int? KSmooth { get; private set; }
@@ -65,11 +66,12 @@ public class TaapiIndicatorRequest {
 
 
     #region *** CONSTRUCTORS ***
-    public TaapiIndicatorRequest( TaapiIndicatorType indicator, TaapiChart chart, string? id = null, int? backtrack = null, bool? gaps = null, int? period = null, int? stddev = null, int? multiplier = null, int? optInFastPeriod = null, int? optInSlowPeriod = null, int? optInSignalPeriod = null, int? kPeriod = null, int? dPeriod = null, int? kSmooth = null) {
+    public TaapiIndicatorPropertiesRequest(TaapiIndicatorType indicator, TaapiChart chart, string? id = null, int? backtrack = null, bool? gaps = null, int? period = null, int? stddev = null, int? multiplier = null, int? optInFastPeriod = null, int? optInSlowPeriod = null, int? optInSignalPeriod = null, int? kPeriod = null, int? dPeriod = null, int? kSmooth = null)
+    {
 
         Id = id;
         Indicator = indicator.GetDescription();
-        //Chart = chart.GetDescription();
+        Chart = chart.GetDescription();
         Backtrack = backtrack;
         Gaps = gaps;
         Period = period;
