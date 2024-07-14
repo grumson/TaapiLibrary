@@ -38,6 +38,21 @@ public class TaapiClient {
     // Get Indicator directly
     public async Task<TaapiIndicatorValuesResponse> GetIndicatorAsync(string apiKey, string symbol, TaapiExchange exchange, TaapiCandlesInterval candlesInterval, TaapiIndicatorPropertiesRequest directParametersRequest ) {
 
+        // check if the symbol is null or empty
+        if (string.IsNullOrEmpty(symbol)) {
+            throw new ArgumentException("The symbol cannot be null or empty.");
+        }
+
+        // check if the apiKey is null or empty
+        if (string.IsNullOrEmpty(apiKey)) {
+            throw new ArgumentException("The API key cannot be null or empty.");
+        }
+
+        // check if the TaapiIndicatorPropertiesRequest is null or empty
+        if (directParametersRequest == null) {
+            throw new ArgumentException("The TaapiIndicatorPropertiesRequest cannot be null or empty.");
+        }
+
         // Set the Mandatory Parameters
         var parametersMandatory = $"exchange={exchange.GetDescription()}&symbol={symbol}&interval={candlesInterval.GetDescription()}";
 
@@ -47,26 +62,85 @@ public class TaapiClient {
         // create the URL
         var url = $"{_baseUrl}/{directParametersRequest.Indicator}?secret={apiKey}&{parametersMandatory}&{parametersOptional}";
 
-        // Send the request
-        var response = await _httpClient.GetAsync(url);
-        response.EnsureSuccessStatusCode();
-        var jsonString = await response.Content.ReadAsStringAsync();
+        try {
 
-        // Deserialize the response
-        TaapiIndicatorValuesResponse? taapiIndicatorValuesResponse = JsonConvert.DeserializeObject<TaapiIndicatorValuesResponse>(jsonString);
+            // Send the request
+            var response = await _httpClient.GetAsync(url);
 
-        if (taapiIndicatorValuesResponse != null) {
-            return taapiIndicatorValuesResponse;
+            // Unauthorized
+            if (response.StatusCode == HttpStatusCode.Unauthorized) {
+                Console.WriteLine("Unauthorized. Invalid API key.");
+                throw new UnauthorizedAccessException("Unauthorized. Invalid API key.");
+            }
+            // Rate limit exceeded
+            else if (response.StatusCode == HttpStatusCode.TooManyRequests) {
+                // Obravnava presežene omejitve hitrosti
+                var retryAfter = response.Headers.RetryAfter?.Delta?.TotalSeconds ?? 60; // Predpostavimo 60 sekund, če Retry-After glava ni podana
+                Console.WriteLine($"Rate limit exceeded. Retry after {retryAfter} seconds.");
+                throw new RateLimitExceededException($"Rate limit exceeded. Retry after {retryAfter} seconds.", retryAfter);
+            }
+
+
+            if (!response.IsSuccessStatusCode) {
+
+                // Logiranje in obdelava različnih statusnih kod
+                var errorContent = await response.Content.ReadAsStringAsync();
+                // Log the error to the console
+                Console.WriteLine($"Error fetching indicator: {response.StatusCode}, {errorContent}");
+                // Throw an exception for not correct parameters
+                throw new Exception($"Error fetching indicator: {response.StatusCode}, {errorContent}");
+            }
+
+
+            var jsonString = await response.Content.ReadAsStringAsync();
+
+            // Deserialize the response
+            TaapiIndicatorValuesResponse? taapiIndicatorValuesResponse = JsonConvert.DeserializeObject<TaapiIndicatorValuesResponse>(jsonString);
+
+            if (taapiIndicatorValuesResponse != null) {
+                return taapiIndicatorValuesResponse;
+            }
+
         }
-        else {
-            return new TaapiIndicatorValuesResponse();
+        catch (HttpRequestException e) {
+            Console.WriteLine($"Request error: {e.Message}");
+            throw;
+        }
+        catch (JsonException e) {
+            Console.WriteLine($"JSON deserialization error: {e.Message}");
+            throw;
+        }
+        catch (InvalidOperationException invalidOperationException) {
+            // Handle invalid operation exceptions
+            Console.WriteLine($"Invalid Operation Error: {invalidOperationException.Message}");
+            throw;
+        }
+        catch (TaskCanceledException taskCanceledException) {
+            // Handle task canceled exceptions
+            Console.WriteLine($"Task Canceled Error: {taskCanceledException.Message}");
+            throw;
+        }
+        catch (UriFormatException UriFormatException) {
+            // Handle URI format exceptions
+            Console.WriteLine($"URI Format Error: {UriFormatException.Message}");
+            throw;
+        }
+        catch (Exception e) {
+            Console.WriteLine($"Unexpected error: {e.Message}");
+            throw;
         }
 
+        return new TaapiIndicatorValuesResponse();
     }//end GetIndicatorAsync()
 
 
     // Post Bulk Indicators
     public async Task<List<TaapiBulkResponse>> PostBulkIndicatorsAsync(TaapiBulkRequest requests) {
+
+        // Check if the requests are null
+        if (requests == null) {
+            throw new ArgumentNullException(nameof(requests), "The requests cannot be null.");
+        }
 
         // Set the URL
         var url = $"{_baseUrl}/bulk";

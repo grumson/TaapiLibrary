@@ -33,8 +33,6 @@ public enum TaapiIndicatorType {
     [Description("supertrend")]
     SuperTrend,
 
-
-
     [JsonProperty("atr")]
     [Description("atr")]
     Atr,

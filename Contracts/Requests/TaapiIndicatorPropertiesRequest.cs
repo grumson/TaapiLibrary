@@ -3,8 +3,7 @@ using TaapiLibrary.Enums;
 
 
 namespace TaapiLibrary.Contracts.Requests;
-public class TaapiIndicatorPropertiesRequest
-{
+public class TaapiIndicatorPropertiesRequest {
 
 
     #region *** PROPERTIES ***
@@ -65,18 +64,19 @@ public class TaapiIndicatorPropertiesRequest
 
 
     // StochRsi
-    [JsonProperty("rsiPeriod")]
-    public int? rsiPeriod { get; set; }
+    [JsonProperty("RsiPeriod")]
+    public int? RsiPeriod { get; set; }
 
-    [JsonProperty("stochasticPeriod")]
-    public int? stochasticPeriod { get; set; }
+    [JsonProperty("StochasticPeriod")]
+    public int? StochasticPeriod { get; set; }
 
     #endregion
 
 
     #region *** CONSTRUCTORS ***
-    public TaapiIndicatorPropertiesRequest(TaapiIndicatorType indicator, TaapiChart chart, string? id = null, int? backtrack = null, bool? gaps = null, int? period = null, int? stddev = null, int? multiplier = null, int? optInFastPeriod = null, int? optInSlowPeriod = null, int? optInSignalPeriod = null, int? kPeriod = null, int? dPeriod = null, int? kSmooth = null)
-    {
+    public TaapiIndicatorPropertiesRequest(TaapiIndicatorType indicator, TaapiChart chart, string? id = null, int? backtrack = null,
+        bool? gaps = null, int? period = null, int? stddev = null, int? multiplier = null, int? optInFastPeriod = null, int? optInSlowPeriod = null,
+        int? optInSignalPeriod = null, int? kPeriod = null, int? dPeriod = null, int? kSmooth = null, int? rsiPeriod = null, int? stochasticPeriod = null) {
 
         Id = id;
         Indicator = indicator.GetDescription();
@@ -92,6 +92,8 @@ public class TaapiIndicatorPropertiesRequest
         KPeriod = kPeriod;
         DPeriod = dPeriod;
         KSmooth = kSmooth;
+        RsiPeriod = rsiPeriod;
+        StochasticPeriod = stochasticPeriod;
 
     }
     #endregion
