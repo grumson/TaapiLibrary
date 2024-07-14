@@ -33,6 +33,24 @@ public enum TaapiIndicatorType {
     [Description("supertrend")]
     SuperTrend,
 
+
+
+    [JsonProperty("atr")]
+    [Description("atr")]
+    Atr,
+
+    [JsonProperty("stochrsi")]
+    [Description("stochrsi")]
+    StochRsi,
+
+    [JsonProperty("ma")]
+    [Description("ma")]
+    Ma,
+
+    [JsonProperty("dmi")]
+    [Description("dmi")]
+    Dmi,
+
 }// enum
 
 

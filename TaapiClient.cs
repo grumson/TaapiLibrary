@@ -36,7 +36,7 @@ public class TaapiClient {
     #region *** PUBLIC METHODS ***
 
     // Get Indicator directly
-    public async Task<T> GetIndicator<T>(string apiKey, string symbol, TaapiExchange exchange, TaapiCandlesInterval candlesInterval, TaapiIndicatorPropertiesRequest directParametersRequest ) {
+    public async Task<TaapiIndicatorValuesResponse> GetIndicatorAsync(string apiKey, string symbol, TaapiExchange exchange, TaapiCandlesInterval candlesInterval, TaapiIndicatorPropertiesRequest directParametersRequest ) {
 
         // Set the Mandatory Parameters
         var parametersMandatory = $"exchange={exchange.GetDescription()}&symbol={symbol}&interval={candlesInterval.GetDescription()}";
@@ -51,9 +51,18 @@ public class TaapiClient {
         var response = await _httpClient.GetAsync(url);
         response.EnsureSuccessStatusCode();
         var jsonString = await response.Content.ReadAsStringAsync();
-        return JsonConvert.DeserializeObject<T>(jsonString);
 
-    }//end GetIndicator()
+        // Deserialize the response
+        TaapiIndicatorValuesResponse? taapiIndicatorValuesResponse = JsonConvert.DeserializeObject<TaapiIndicatorValuesResponse>(jsonString);
+
+        if (taapiIndicatorValuesResponse != null) {
+            return taapiIndicatorValuesResponse;
+        }
+        else {
+            return new TaapiIndicatorValuesResponse();
+        }
+
+    }//end GetIndicatorAsync()
 
 
     // Post Bulk Indicators

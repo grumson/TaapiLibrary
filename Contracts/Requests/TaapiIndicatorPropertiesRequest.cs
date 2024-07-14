@@ -25,7 +25,7 @@ public class TaapiIndicatorPropertiesRequest
     public bool? Gaps { get; private set; }
 
 
-    // RSI, SMA, EMA, BBands, SuperTrend
+    // RSI, SMA, EMA, BBands, SuperTrend, ATR, MA, DMI
     [JsonProperty("period")]
     public int? Period { get; private set; }
 
@@ -51,16 +51,25 @@ public class TaapiIndicatorPropertiesRequest
     public int? OptInSignalPeriod { get; private set; }
 
 
-    // Stochastic
+    // Stochastic, StochRsi
     [JsonProperty("kPeriod")]
     public int? KPeriod { get; private set; }
 
     [JsonProperty("dPeriod")]
     public int? DPeriod { get; private set; }
 
+
+    // Stochastic
     [JsonProperty("kSmooth")]
     public int? KSmooth { get; private set; }
 
+
+    // StochRsi
+    [JsonProperty("rsiPeriod")]
+    public int? rsiPeriod { get; set; }
+
+    [JsonProperty("stochasticPeriod")]
+    public int? stochasticPeriod { get; set; }
 
     #endregion
 

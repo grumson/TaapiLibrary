@@ -10,7 +10,7 @@ public class TaapiBulkDataResponse
 
     public string id { get; set; } = string.Empty;
     public string indicator { get; set; } = string.Empty;
-    public TaapiBulkDataIndicatorResponse result { get; set; } = null!;
+    public TaapiIndicatorValuesResponse result { get; set; } = null!;
     public List<string> errors { get; set; } = new List<string>();
 
 }// class

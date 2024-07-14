@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace TaapiLibrary.Contracts.Response.Bulk;
-public class TaapiBulkDataIndicatorResponse
+public class TaapiIndicatorValuesResponse
 {
 
     public int? backtrack { get; set; }
 
 
-    // RSI, SMA, EMA, SuperTrend
+    // RSI, SMA, EMA, SuperTrend, ATR, MA
     public double? value { get; set; }
 
 
@@ -34,6 +34,17 @@ public class TaapiBulkDataIndicatorResponse
     public double? valueUpperBand { get; set; }
     public double? valueMiddleBand { get; set; }
     public double? valueLowerBand { get; set; }
+
+
+    // StochRsi
+    public double? valueFastK { get; set; }
+    public double? valueFastD { get; set; }
+
+
+    // DMI
+    public double? Adx { get; set; }
+    public double? Pdi { get; set; }
+    public double? Mdi { get; set; }
 
 
 }// class
