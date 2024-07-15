@@ -25,9 +25,10 @@ public class TaapiClient {
 
 
     #region *** CONSTRUCTORS ***
-    public TaapiClient(int _retryAfterSeconds = 60) {
+    public TaapiClient(int retryAfterSeconds = 60) {
 
         _httpClient = new HttpClient();
+        _retryAfterSeconds = retryAfterSeconds;
     }
     #endregion
 
@@ -162,7 +163,7 @@ public class TaapiClient {
             // Rate limit exceeded
             else if (response.StatusCode == HttpStatusCode.TooManyRequests) {
                 // Obravnava presežene omejitve hitrosti
-                var retryAfter = response.Headers.RetryAfter?.Delta?.TotalSeconds ?? 60; // Predpostavimo 60 sekund, če Retry-After glava ni podana
+                var retryAfter = response.Headers.RetryAfter?.Delta?.TotalSeconds ?? _retryAfterSeconds; // Predpostavimo 60 sekund, če Retry-After glava ni podana
                 throw new RateLimitExceededException($"Rate limit exceeded. Retry after {retryAfter} seconds.", retryAfter);
             }
 
