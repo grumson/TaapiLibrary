@@ -1,3 +1,13 @@
+
+
+The TaapiLibrary is a C# library designed for personal use. 
+
+It currently supports only the exchanges listed in the TaapiExchange.cs file and the indicators listed in the TaapiIndicatorType.cs file. 
+These files define the available exchanges and indicators that can be used with the library. 
+If you want to use a different exchange or indicator, you would need to modify the library accordingly.
+
+
+
 # TaapiLibrary Documentation
 
 The TaapiLibrary is a C# library that provides a client for interacting with the Taapi API. It allows you to retrieve indicator values and perform bulk indicator requests.

@@ -1,22 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-	  <PackageId>Grumson.Utilities.Taapi</PackageId>
-	  <Version>1.0.1</Version>
-	  <FileVersion>1.0.1</FileVersion>
-	  <Authors>Dejan Grum</Authors>
-	  <Company>Grumson</Company>
-	  <Description>Taapi library</Description>
-    <PackageTags>taapi, crypto, trading, bot</PackageTags>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<PackageId>Grumson.Utilities.Taapi</PackageId>
+		<Version>1.0.2</Version>
+		<FileVersion>1.0.2</FileVersion>
+		<Authors>Dejan Grum</Authors>
+		<Company>Grumson</Company>
+		<Description>Taapi library</Description>
+		<PackageTags>taapi, crypto, trading, bot</PackageTags>
+		<!-- Dodajte URL vašega projekta tukaj -->
+		<PackageProjectUrl>https://github.com/grumson/TaapiLibrary.git</PackageProjectUrl>
+		<!-- Dodajte URL vašega repozitorija tukaj -->
+		<RepositoryUrl>https://github.com/vasuporabnik/vasrepozitorij</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<!-- Dodajte pot do LICENSE.txt -->
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<!-- Dodajte pot do README.md -->
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-	  <None Include="README.md" Pack="true" PackagePath="\"/>
-	  <None Include="LICENSE.txt" Pack="true" PackagePath="\"/>
   </ItemGroup>
+
+	<ItemGroup>
+		<None Include="LICENSE.txt" Pack="true" PackagePath=""/>
+		<None Include="README.md" Pack="true" PackagePath=""/>
+	</ItemGroup>
+
 
 </Project>
