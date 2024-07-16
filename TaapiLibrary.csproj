@@ -14,7 +14,7 @@
 		<!-- Dodajte URL vašega projekta tukaj -->
 		<PackageProjectUrl>https://github.com/grumson/TaapiLibrary.git</PackageProjectUrl>
 		<!-- Dodajte URL vašega repozitorija tukaj -->
-		<RepositoryUrl>https://github.com/vasuporabnik/vasrepozitorij</RepositoryUrl>
+		<RepositoryUrl>https://github.com/grumson/TaapiLibrary.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<!-- Dodajte pot do LICENSE.txt -->
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
