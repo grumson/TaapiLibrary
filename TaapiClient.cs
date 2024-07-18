@@ -16,7 +16,7 @@ public class TaapiClient {
 
     #region *** PROPERTIES ***
 
-    private readonly HttpClient _httpClient = null!;
+    private static readonly HttpClient _httpClient = new HttpClient();
     private readonly string _baseUrl = "https://api.taapi.io";
     private readonly int _retryAfterSeconds;
 
@@ -25,10 +25,12 @@ public class TaapiClient {
 
 
     #region *** CONSTRUCTORS ***
-    public TaapiClient(int retryAfterSeconds = 60) {
+    public TaapiClient(string baseUrl = "https://api.taapi.io", int retryAfterSeconds = 60) {
 
-        _httpClient = new HttpClient();
+        _baseUrl = baseUrl;
         _retryAfterSeconds = retryAfterSeconds;
+        _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+
     }
     #endregion
 

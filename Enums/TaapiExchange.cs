@@ -21,8 +21,24 @@ public enum TaapiExchange {
     [Description("kraken")]
     Kraken,
 
-    [JsonProperty("bitfinex")]
-    [Description("bitfinex")]
-    Bitfinex,
+    [JsonProperty("bitstamp")]
+    [Description("bitstamp")]
+    Bitstamp,
+
+    [JsonProperty("whitebit")]
+    [Description("whitebit")]
+    WhiteBIT,
+
+    [JsonProperty("bybit")]
+    [Description("bybit")]
+    ByBit,
+
+    [JsonProperty("gateio")]
+    [Description("gateio")]
+    GateIo,
+
+    [JsonProperty("binanceus")]
+    [Description("binanceus")]
+    BinanceUs,
 
 }// enum

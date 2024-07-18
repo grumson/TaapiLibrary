@@ -20,10 +20,12 @@ The `TaapiClient` class is the main class in the TaapiLibrary. It provides metho
 
 #### `TaapiClient(int retryAfterSeconds = 60)`
 
-- Initializes a new instance of the `TaapiClient` class.
+- Initializes a new instance of the `TaapiClient` class with optional parameters for the base URL and retry delay.
 - Parameters:
+  - `baseUrl` (optional): The base URL for the Taapi API. Default value is "https://api.taapi.io".
   - `retryAfterSeconds` (optional): The number of seconds to wait before retrying a request if the rate limit is exceeded. Default value is 60 seconds.
 
+### Public
 ### Public Methods
 
 #### `Task<TaapiIndicatorValuesResponse> GetIndicatorAsync(string apiKey, string symbol, TaapiExchange exchange, TaapiCandlesInterval candlesInterval, TaapiIndicatorPropertiesRequest directParametersRequest)`
@@ -235,6 +237,55 @@ TaapiBulkRequest bulkRequest = new TaapiBulkRequest( _secret, bulkConstructs);
 var bulkIndicators = taapiClient.PostBulkIndicatorsAsync(bulkRequest).Result;
 
 ```
+
+# Changelog
+
+This section outlines the changes and improvements made in each version of the TaapiLibrary.
+
+
+## Version 1.0.3-alpha - 2023-07-18
+
+### Added
+- Posibility to set the `TaapiClient` base URL in the constructor.
+- Support for additional exchanges in `TaapiExchange.cs`.
+
+### Improved
+- Performance optimizations in the `TaapiClient` class for faster API responses.
+
+### Fixed
+- Fixed an issue where `RateLimitExceededException` was not correctly handled in some scenarios.
+
+
+## Version 1.0.2 - 2023-07-16
+
+### Added
+-
+
+### Improved
+- Some minor improvements.
+
+### Fixed
+- Some minor bug fixes and improvements.
+
+
+## Version 1.0.1 - 2023-07-15
+
+### Added
+-
+
+### Improved
+- Some minor improvements.
+
+### Fixed
+- Some minor bug fixes and improvements.
+
+
+## Version 1.0.0 - 2023-07-15
+
+- Initial release of the TaapiLibrary.
+- Support for basic indicator retrieval and bulk indicator requests.
+
+
 
 This is just a basic example. You can customize the symbol, exchange, candles interval, and indicator properties according to your needs.
 
