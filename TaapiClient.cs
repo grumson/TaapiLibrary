@@ -9,8 +9,10 @@ using TaapiLibrary.Contracts.Requests;
 using TaapiLibrary.Contracts.Requests.Interfaces;
 using TaapiLibrary.Contracts.Requests.Interfaces.Indicators;
 using TaapiLibrary.Contracts.Response.Bulk;
+using TaapiLibrary.Contracts.Response.Bulk.Interfaces;
 using TaapiLibrary.Enums;
 using TaapiLibrary.Exceptions;
+using TaapiLibrary.Models.Indicators.Results;
 
 namespace TaapiLibrary;
 public class TaapiClient {
@@ -140,6 +142,7 @@ public class TaapiClient {
 
 
     // Post Bulk Indicators
+    [Obsolete("GetIndicatorAsync is deprecated, please use the new method GetBulkIndicatorsResults instead.", true)]
     public async Task<List<TaapiBulkResponse>> PostBulkIndicatorsAsync(TaapiBulkRequest requests) {
 
         // Check if the requests are null
@@ -228,6 +231,101 @@ public class TaapiClient {
     }//end PostBulkIndicatorsAsync()
 
 
+    // Get Bulk Indicators results
+    public async Task<List<ITaapiIndicatorResults>> GetBulkIndicatorsResults(TaapiBulkRequest requests) {
+
+
+        // Check if the requests are null
+        if (requests == null) {
+            throw new ArgumentNullException(nameof(requests), "The requests cannot be null.");
+        }
+
+        // Set the URL
+        var url = $"{_baseUrl}/bulk";
+
+        // Serialize the request
+        var content = new StringContent(JsonConvert.SerializeObject(requests), Encoding.UTF8, "application/json");
+
+        try {
+
+            // Send the request
+            var response = await _httpClient.PostAsync(url, content);
+
+            // Check the response status code
+
+            // Unauthorized
+            if (response.StatusCode == HttpStatusCode.Unauthorized) {
+                throw new UnauthorizedAccessException("Unauthorized. Invalid API key.");
+            }
+            // Rate limit exceeded
+            else if (response.StatusCode == HttpStatusCode.TooManyRequests) {
+                // Obravnava presežene omejitve hitrosti
+                var retryAfter = response.Headers.RetryAfter?.Delta?.TotalSeconds ?? _retryAfterSeconds; // Predpostavimo 60 sekund, če Retry-After glava ni podana
+                throw new RateLimitExceededException($"Rate limit exceeded. Retry after {retryAfter} seconds.", retryAfter);
+            }
+
+            // Check if the response is successful
+            response.EnsureSuccessStatusCode();
+
+            // Read the response content
+            var jsonString = await response.Content.ReadAsStringAsync();
+
+            // Chek if the response have errors
+
+
+            // Deserialize the response
+            TaapiBulkResponse? taapiBulkResponse = JsonConvert.DeserializeObject<TaapiBulkResponse>(jsonString);
+
+            // Map the response to the ITaapiIndicatorResults
+            List<ITaapiIndicatorResults> taapiIndicatorResultsList = new List<ITaapiIndicatorResults>();
+            if(taapiBulkResponse?.data?.Count > 0) {
+                foreach (var taapiBulkDataResponse in taapiBulkResponse.data) {
+
+                    ITaapiIndicatorResults taapiIndicatorResults = MapIndicatorResults(taapiBulkDataResponse);
+
+                    taapiIndicatorResultsList.Add(taapiIndicatorResults);
+                }
+            }
+
+
+            // Return the indicators results
+            return taapiIndicatorResultsList;
+        }
+        catch (HttpRequestException httpRequestException) {
+            // Handle HTTP request specific exceptions
+            Console.WriteLine($"HTTP Request Error: {httpRequestException.Message}");
+            throw;
+        }
+        catch (JsonException jsonException) {
+            // Handle JSON serialization/deserialization exceptions
+            Console.WriteLine($"JSON Error: {jsonException.Message}");
+            throw;
+        }
+        catch (InvalidOperationException invalidOperationException) {
+            // Handle invalid operation exceptions
+            Console.WriteLine($"Invalid Operation Error: {invalidOperationException.Message}");
+            throw;
+        }
+        catch (TaskCanceledException taskCanceledException) {
+            // Handle task canceled exceptions
+            Console.WriteLine($"Task Canceled Error: {taskCanceledException.Message}");
+            throw;
+        }
+        catch (UriFormatException UriFormatException) {
+            // Handle URI format exceptions
+            Console.WriteLine($"URI Format Error: {UriFormatException.Message}");
+            throw;
+        }
+        catch (Exception ex) {
+            // Handle any other exceptions
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            throw;
+        }
+
+
+    }//end GetBulkIndicatorsResults()
+
+
     // Create a Bulk Request
     public TaapiBulkRequest CreateBulkRequest(string apiKey, List<TaapiBulkConstruct> bulkConstructList) {
 
@@ -255,7 +353,7 @@ public class TaapiClient {
 
 
     // Create a Bulk Construct
-    public TaapiBulkConstruct CreateBulkConstruct(TaapiExchange exchange, string symbol, TaapiCandlesInterval candlesInterval, List<ITaapiIndicatorRequest> indicatorList) {
+    public TaapiBulkConstruct CreateBulkConstruct(TaapiExchange exchange, string symbol, TaapiCandlesInterval candlesInterval, List<ITaapiIndicatorProperties> indicatorList) {
 
 
         #region Validate
@@ -286,6 +384,26 @@ public class TaapiClient {
         return bulkConstruct;
     }//end CreateBulkConstruct()
 
+
+    // Get Indicator Results from Bulk Response list
+    public List<ITaapiIndicatorResults> GetIndicatorResults(List<TaapiBulkResponse> taapiBulkResponseList) {
+
+        List<ITaapiIndicatorResults> taapiIndicatorResultsList = new List<ITaapiIndicatorResults>();
+
+        foreach (var taapiBulkResponse in taapiBulkResponseList) {
+
+            foreach (var taapiBulkDataResponse in taapiBulkResponse.data) {
+
+                ITaapiIndicatorResults taapiIndicatorResults = MapIndicatorResults(taapiBulkDataResponse);
+
+                taapiIndicatorResultsList.Add(taapiIndicatorResults);
+            }
+        }
+
+        return taapiIndicatorResultsList;
+    }//end GetIndicatorResults()
+
+
     #endregion
 
 
@@ -293,19 +411,19 @@ public class TaapiClient {
     #region *** PRIVATE METHODS ***
 
     // Map ITaapiIndicatorRequest to TaapiIndicatorPropertiesRequest
-    private TaapiIndicatorPropertiesRequest MapIndicatorRequest(ITaapiIndicatorRequest indicatorRequest) {
+    private TaapiIndicatorPropertiesRequest MapIndicatorRequest(ITaapiIndicatorProperties indicatorRequest) {
 
         TaapiIndicatorPropertiesRequest taapiIndicatorPropertiesRequest = null!;
             
         // RSI
-        if (indicatorRequest is IRsiIndicatorResponse rsiIndicatorResponse) {
+        if (indicatorRequest is IRsiIndicatorProperties rsiIndicatorResponse) {
 
             taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
                 Period = rsiIndicatorResponse.Period,
             };
         }
         // MACD
-        else if (indicatorRequest is IMacdIndicatorResponse macdIndicatorResponse) {
+        else if (indicatorRequest is IMacdIndicatorProperties macdIndicatorResponse) {
 
             taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
                 OptInFastPeriod = macdIndicatorResponse.OptInFastPeriod,
@@ -313,6 +431,21 @@ public class TaapiClient {
                 OptInSignalPeriod = macdIndicatorResponse.OptInSignalPeriod,
             };
         }
+        // SMA
+        else if (indicatorRequest is ISmaIndicatorProperties smaIndicatorResponse) {
+
+            taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
+                Period = smaIndicatorResponse.Period,
+            };
+        }
+        // EMA
+        else if (indicatorRequest is IEmaIndicatorProperties emaIndicatorResponse) {
+
+            taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
+                Period = emaIndicatorResponse.Period,
+            };
+        }
+        // Not implemented
         else {
 
             throw new NotImplementedException("The indicator is not implemented.");
@@ -321,6 +454,63 @@ public class TaapiClient {
 
         return taapiIndicatorPropertiesRequest;
     }//end MapIndicatorRequest()
+
+
+    // Map TaapiBulkDataResponse to ITaapiIndicatorResults
+    private ITaapiIndicatorResults MapIndicatorResults(TaapiBulkDataResponse taapiBulkDataResponse) {
+
+        ITaapiIndicatorResults taapiIndicatorResults = null!;
+
+        // RSI
+        if (taapiBulkDataResponse.indicator == TaapiIndicatorType.RSI.GetDescription()) {
+
+            taapiIndicatorResults = new RsiIndicatorResults {
+                Id = taapiBulkDataResponse.id,
+                Indicator = taapiBulkDataResponse.indicator,
+                Errors = taapiBulkDataResponse.errors,
+                Value = taapiBulkDataResponse.result.value,
+            };
+        }
+        // MACD
+        else if (taapiBulkDataResponse.indicator == TaapiIndicatorType.MACD.GetDescription()) {
+
+            taapiIndicatorResults = new MacdIndicatorResults {
+                Id = taapiBulkDataResponse.id,
+                Indicator = taapiBulkDataResponse.indicator,
+                Errors = taapiBulkDataResponse.errors,
+                ValueMACD = taapiBulkDataResponse.result.valueMACD,
+                ValueMACDSignal = taapiBulkDataResponse.result.valueMACDSignal,
+                ValueMACDHist = taapiBulkDataResponse.result.valueMACDHist,
+            };
+        }
+        // SMA
+        else if (taapiBulkDataResponse.indicator == TaapiIndicatorType.SMA.GetDescription()) {
+
+            taapiIndicatorResults = new SmaIndicatorResults {
+                Id = taapiBulkDataResponse.id,
+                Indicator = taapiBulkDataResponse.indicator,
+                Errors = taapiBulkDataResponse.errors,
+                Value = taapiBulkDataResponse.result.value,
+            };
+        }
+        // EMA
+        else if (taapiBulkDataResponse.indicator == TaapiIndicatorType.EMA.GetDescription()) {
+
+            taapiIndicatorResults = new EmaIndicatorResults {
+                Id = taapiBulkDataResponse.id,
+                Indicator = taapiBulkDataResponse.indicator,
+                Errors = taapiBulkDataResponse.errors,
+                Value = taapiBulkDataResponse.result.value,
+            };
+        }
+        // Not implemented
+        else {
+
+            throw new NotImplementedException("The indicator is not implemented.");
+        }
+
+        return taapiIndicatorResults;
+    }//end MapIndicatorResults()
 
     #endregion
 

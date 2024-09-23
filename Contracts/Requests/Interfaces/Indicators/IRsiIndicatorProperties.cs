@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace TaapiLibrary.Contracts.Requests.Interfaces.Indicators;
-public interface IRsiIndicatorResponse : ITaapiIndicatorRequest {
+public interface IRsiIndicatorProperties : ITaapiIndicatorProperties {
 
     int? Period { get; set; }
 

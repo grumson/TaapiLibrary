@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using TaapiLibrary.Contracts.Requests.Interfaces.Indicators;
 using TaapiLibrary.Enums;
 
-namespace TaapiLibrary.Models.IndicatorProperties;
-public class MacdIndicatorPropertie : IMacdIndicatorResponse {
+namespace TaapiLibrary.Models.Indicators.Properties;
+public class RsiIndicatorPropertie : IRsiIndicatorProperties
+{
 
 
     #region *** PROPERTIES ***
@@ -18,12 +19,9 @@ public class MacdIndicatorPropertie : IMacdIndicatorResponse {
     public string? Backtrack { get; set; }
     public bool? ChartGaps { get; set; }
     public string? Results { get; set; }
-    public int? OptInFastPeriod { get; set; }
-    public int? OptInSlowPeriod { get; set; }
-    public int? OptInSignalPeriod { get; set; }
+    public int? Period { get; set; }
 
     #endregion
-
 
 
 }// class

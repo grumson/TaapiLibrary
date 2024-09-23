@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TaapiLibrary.Enums;
 
 namespace TaapiLibrary.Contracts.Requests.Interfaces;
-public interface ITaapiIndicatorRequest {
+public interface ITaapiIndicatorProperties {
 
     string Id { get; set; }
     TaapiIndicatorType Indicator { get; set; }

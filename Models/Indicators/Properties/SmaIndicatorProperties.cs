@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TaapiLibrary.Contracts.Requests.Interfaces.Indicators;
+using TaapiLibrary.Contracts.Response.Bulk.Interfaces.Indicators;
 using TaapiLibrary.Enums;
 
-namespace TaapiLibrary.Models.IndicatorProperties;
-public class RsiIndicatorPropertie : IRsiIndicatorResponse {
+namespace TaapiLibrary.Models.Indicators.Properties;
+public class SmaIndicatorProperties : ISmaIndicatorProperties {
 
 
     #region *** PROPERTIES ***
@@ -21,5 +22,6 @@ public class RsiIndicatorPropertie : IRsiIndicatorResponse {
     public int? Period { get; set; }
 
     #endregion
+
 
 }// class

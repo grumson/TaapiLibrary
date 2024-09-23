@@ -12,15 +12,15 @@ public enum TaapiIndicatorType {
     [JsonProperty("macd")]
     [Description("macd")]
     MACD,
-
+    
     [JsonProperty("sma")]
     [Description("sma")]
     SMA,
-
+    
     [JsonProperty("ema")]
     [Description("ema")]
     EMA,
-
+    /*
     [JsonProperty("stoch")]
     [Description("stoch")]
     Stochastic,
@@ -48,7 +48,7 @@ public enum TaapiIndicatorType {
     [JsonProperty("dmi")]
     [Description("dmi")]
     Dmi,
-
+    */
 }// enum
 
 
