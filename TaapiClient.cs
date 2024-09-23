@@ -6,6 +6,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using TaapiLibrary.Contracts.Requests;
+using TaapiLibrary.Contracts.Requests.Interfaces;
+using TaapiLibrary.Contracts.Requests.Interfaces.Indicators;
 using TaapiLibrary.Contracts.Response.Bulk;
 using TaapiLibrary.Enums;
 using TaapiLibrary.Exceptions;
@@ -223,11 +225,100 @@ public class TaapiClient {
 
     }//end PostBulkIndicatorsAsync()
 
+
+    // Create a Bulk Request
+    public TaapiBulkRequest CreateBulkRequest(string apiKey, List<TaapiBulkConstruct> bulkConstructList) {
+
+
+        #region Validate
+
+        // check if the apiKey is null or empty
+        if (string.IsNullOrWhiteSpace(apiKey)) {
+            throw new ArgumentException("The API key cannot be null or empty.");
+        }
+
+        // check if the bulkConstructList is null or empty
+        if (bulkConstructList == null || bulkConstructList.Count == 0) {
+            throw new ArgumentException("The list of bulk constructs cannot be null or empty.");
+        }
+
+        #endregion
+
+
+        TaapiBulkRequest bulkRequest = new TaapiBulkRequest(apiKey, bulkConstructList);
+
+
+        return bulkRequest;
+    }//end CreateBulkRequest()
+
+
+    // Create a Bulk Construct
+    public TaapiBulkConstruct CreateBulkConstruct(TaapiExchange exchange, string symbol, TaapiCandlesInterval candlesInterval, List<ITaapiIndicatorRequest> indicatorList) {
+
+
+        #region Validate
+
+        // check if the symbol is null or empty
+        if (string.IsNullOrWhiteSpace(symbol)) {
+            throw new ArgumentException("The symbol cannot be null or empty.");
+        }
+
+        // check if the indicatorList is null or empty
+        if (indicatorList == null || indicatorList.Count == 0) {
+            throw new ArgumentException("The list of indicators cannot be null or empty.");
+        }
+
+        #endregion
+
+        List<TaapiIndicatorPropertiesRequest> taapiIndicatorPropertiesRequestList = new List<TaapiIndicatorPropertiesRequest>();
+
+        foreach (var indicatorRequest in indicatorList) {
+
+            TaapiIndicatorPropertiesRequest taapiIndicatorPropertiesRequest = MapIndicatorRequest(indicatorRequest);
+
+            taapiIndicatorPropertiesRequestList.Add(taapiIndicatorPropertiesRequest);
+        }
+
+        TaapiBulkConstruct bulkConstruct = new TaapiBulkConstruct(exchange, symbol, candlesInterval, taapiIndicatorPropertiesRequestList);
+
+        return bulkConstruct;
+    }//end CreateBulkConstruct()
+
     #endregion
 
 
 
     #region *** PRIVATE METHODS ***
+
+    // Map ITaapiIndicatorRequest to TaapiIndicatorPropertiesRequest
+    private TaapiIndicatorPropertiesRequest MapIndicatorRequest(ITaapiIndicatorRequest indicatorRequest) {
+
+        TaapiIndicatorPropertiesRequest taapiIndicatorPropertiesRequest = null!;
+            
+        // RSI
+        if (indicatorRequest is IRsiIndicatorResponse rsiIndicatorResponse) {
+
+            taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
+                Period = rsiIndicatorResponse.Period,
+            };
+        }
+        // MACD
+        else if (indicatorRequest is IMacdIndicatorResponse macdIndicatorResponse) {
+
+            taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
+                OptInFastPeriod = macdIndicatorResponse.OptInFastPeriod,
+                OptInSlowPeriod = macdIndicatorResponse.OptInSlowPeriod,
+                OptInSignalPeriod = macdIndicatorResponse.OptInSignalPeriod,
+            };
+        }
+        else {
+
+            throw new NotImplementedException("The indicator is not implemented.");
+        }
+
+
+        return taapiIndicatorPropertiesRequest;
+    }//end MapIndicatorRequest()
 
     #endregion
 

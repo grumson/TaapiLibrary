@@ -2,8 +2,7 @@
 using TaapiLibrary.Enums;
 
 namespace TaapiLibrary.Contracts.Requests;
-public class TaapiBulkConstruct
-{
+public class TaapiBulkConstruct {
 
 
     #region *** PROPERTIES ***
@@ -32,26 +31,22 @@ public class TaapiBulkConstruct
 
 
     #region *** CONSTRUCTORS ***
-    public TaapiBulkConstruct(TaapiExchange exchange, string symbol, TaapiCandlesInterval interval, List<TaapiIndicatorPropertiesRequest> indicators)
-    {
-
-
-        Exchange = exchange.GetDescription();
+    public TaapiBulkConstruct(TaapiExchange exchange, string symbol, TaapiCandlesInterval interval, List<TaapiIndicatorPropertiesRequest> indicators) {
 
         // check if the symbol is null or empty
-        if (string.IsNullOrEmpty(symbol))
-        {
+        if (string.IsNullOrEmpty(symbol)) {
             throw new ArgumentException("The symbol cannot be null or empty.");
         }
-        Symbol = symbol;
-
-        Interval = interval.GetDescription();
-
         // check if the list is null or empty
-        if (indicators == null || indicators.Count == 0)
-        {
+        if (indicators == null || indicators.Count == 0) {
             throw new ArgumentException("The list of indicators cannot be null or empty.");
         }
+
+
+        // Set the Construct Parameters
+        Exchange = exchange.GetDescription();
+        Symbol = symbol;
+        Interval = interval.GetDescription();
         Indicators = indicators;
 
     }

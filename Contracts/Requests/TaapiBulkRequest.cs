@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 using TaapiLibrary.Enums;
 
 namespace TaapiLibrary.Contracts.Requests;
-public class TaapiBulkRequest
-{
+public class TaapiBulkRequest {
 
 
     #region *** PROPERTIES ***
@@ -26,22 +25,22 @@ public class TaapiBulkRequest
 
 
     #region *** CONSTRUCTORS ***
-    public TaapiBulkRequest(string secret, List<TaapiBulkConstruct> bulkConstructList)
-    {
+    public TaapiBulkRequest(string secret, List<TaapiBulkConstruct> bulkConstructList) {
 
         // check if the secret is null or empty
-        if (string.IsNullOrEmpty(secret))
-        {
+        if (string.IsNullOrEmpty(secret)) {
             throw new ArgumentException("The secret cannot be null or empty.");
         }
-        Secret = secret;
 
         // check if the list is null or empty
-        if (bulkConstructList == null || bulkConstructList.Count == 0)
-        {
+        if (bulkConstructList == null || bulkConstructList.Count == 0) {
             throw new ArgumentException("The list of constructs cannot be null or empty.");
         }
 
+        // Set the Secret for the TaApi.io account
+        Secret = secret;
+
+        // Set the List of Bulk Constructs
         Construct = bulkConstructList;
 
     }

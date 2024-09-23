@@ -9,58 +9,58 @@ public class TaapiIndicatorPropertiesRequest {
     #region *** PROPERTIES ***
 
     [JsonProperty("id")]
-    public string? Id { get; private set; } = string.Empty;
+    public string? Id { get; set; } = string.Empty;
 
     [JsonProperty("indicator")]
-    public string Indicator { get; private set; }
+    public string Indicator { get; set; }
 
     [JsonProperty("backtrack")]
-    public int? Backtrack { get; private set; }
+    public int? Backtrack { get; set; }
 
     [JsonProperty("chart")]
-    public string? Chart { get; private set; }
+    public string? Chart { get; set; }
 
     [JsonProperty("gaps")]
-    public bool? Gaps { get; private set; }
+    public bool? Gaps { get; set; }
 
 
     // RSI, SMA, EMA, BBands, SuperTrend, ATR, MA, DMI
     [JsonProperty("period")]
-    public int? Period { get; private set; }
+    public int? Period { get; set; }
 
 
     // BBands
     [JsonProperty("stddev")]
-    public int? StdDev { get; private set; }
+    public int? StdDev { get; set; }
 
 
     // SuperTrend
     [JsonProperty("multiplier")]
-    public int? Multiplier { get; private set; }
+    public int? Multiplier { get; set; }
 
 
     // MACD
     [JsonProperty("optInFastPeriod")]
-    public int? OptInFastPeriod { get; private set; }
+    public int? OptInFastPeriod { get; set; }
 
     [JsonProperty("optInSlowPeriod")]
-    public int? OptInSlowPeriod { get; private set; }
+    public int? OptInSlowPeriod { get; set; }
 
     [JsonProperty("optInSignalPeriod")]
-    public int? OptInSignalPeriod { get; private set; }
+    public int? OptInSignalPeriod { get; set; }
 
 
     // Stochastic, StochRsi
     [JsonProperty("kPeriod")]
-    public int? KPeriod { get; private set; }
+    public int? KPeriod { get; set; }
 
     [JsonProperty("dPeriod")]
-    public int? DPeriod { get; private set; }
+    public int? DPeriod { get; set; }
 
 
     // Stochastic
     [JsonProperty("kSmooth")]
-    public int? KSmooth { get; private set; }
+    public int? KSmooth { get; set; }
 
 
     // StochRsi
