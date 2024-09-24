@@ -29,6 +29,8 @@
 	<ItemGroup>
 		<None Include="LICENSE.txt" Pack="true" PackagePath="" />
 		<None Include="README.md" Pack="true" PackagePath="" />
+		<None Include="BulkRequest.png" Pack="true" PackagePath="" />
+		<None Include="BulkResponse.png" Pack="true" PackagePath="" />
 	</ItemGroup>
 
 	<ItemGroup>
