@@ -9,9 +9,9 @@ namespace TaapiLibrary.Contracts.Requests.Interfaces;
 public interface ITaapiIndicatorProperties {
 
     string Id { get; set; }
-    TaapiIndicatorType Indicator { get; set; }
+    TaapiIndicatorType Indicator { get; }
     TaapiChart Chart { get; set; }
-    string? Backtrack { get; set; }
+    int? Backtrack { get; set; }
     bool? ChartGaps { get; set; }
     string? Results { get; set; }
 

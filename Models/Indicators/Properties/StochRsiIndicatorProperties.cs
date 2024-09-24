@@ -7,18 +7,22 @@ using TaapiLibrary.Contracts.Requests.Interfaces.Indicators;
 using TaapiLibrary.Enums;
 
 namespace TaapiLibrary.Models.Indicators.Properties;
-public class EmaIndicatorPropertie : IEmaIndicatorProperties {
+public class StochRsiIndicatorProperties : IStochRsiIndicatorProperties {
 
 
     #region *** PROPERTIES ***
 
     public string Id { get; set; } = string.Empty;
-    public TaapiIndicatorType Indicator { get; private set; } = TaapiIndicatorType.EMA;
+    public TaapiIndicatorType Indicator { get; private set; } = TaapiIndicatorType.StochRsi;
     public TaapiChart Chart { get; set; }
     public int? Backtrack { get; set; }
     public bool? ChartGaps { get; set; }
     public string? Results { get; set; }
-    public int? Period { get; set; }
+
+    public int? KPeriod { get; set; }
+    public int? DPeriod { get; set; }
+    public int? RsiPeriod { get; set; }
+    public int? StochasticPeriod { get; set; }
 
     #endregion
 

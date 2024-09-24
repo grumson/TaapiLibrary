@@ -13,9 +13,9 @@ public class MacdIndicatorPropertie : IMacdIndicatorProperties {
     #region *** PROPERTIES ***
 
     public string Id { get; set; } = string.Empty;
-    public TaapiIndicatorType Indicator { get; set; }
+    public TaapiIndicatorType Indicator { get; private set; } = TaapiIndicatorType.MACD;
     public TaapiChart Chart { get; set; }
-    public string? Backtrack { get; set; }
+    public int? Backtrack { get; set; }
     public bool? ChartGaps { get; set; }
     public string? Results { get; set; }
     public int? OptInFastPeriod { get; set; }
@@ -23,7 +23,6 @@ public class MacdIndicatorPropertie : IMacdIndicatorProperties {
     public int? OptInSignalPeriod { get; set; }
 
     #endregion
-
 
 
 }// class

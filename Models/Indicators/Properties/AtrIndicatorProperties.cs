@@ -7,13 +7,13 @@ using TaapiLibrary.Contracts.Requests.Interfaces.Indicators;
 using TaapiLibrary.Enums;
 
 namespace TaapiLibrary.Models.Indicators.Properties;
-public class EmaIndicatorPropertie : IEmaIndicatorProperties {
+public class AtrIndicatorProperties : IAtrIndicatorProperties {
 
 
     #region *** PROPERTIES ***
 
     public string Id { get; set; } = string.Empty;
-    public TaapiIndicatorType Indicator { get; private set; } = TaapiIndicatorType.EMA;
+    public TaapiIndicatorType Indicator { get; private set; } = TaapiIndicatorType.Atr;
     public TaapiChart Chart { get; set; }
     public int? Backtrack { get; set; }
     public bool? ChartGaps { get; set; }

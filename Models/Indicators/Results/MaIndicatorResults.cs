@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TaapiLibrary.Contracts.Response.Bulk.Interfaces.Indicators;
 
 namespace TaapiLibrary.Models.Indicators.Results;
-public class RsiIndicatorResults : IRsiIndicatorResults {
+public class MaIndicatorResults : IMaIndicatorResults {
 
 
     #region *** PROPERTIES ***

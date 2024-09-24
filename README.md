@@ -1,65 +1,157 @@
 
 
-The TaapiLibrary is a C# library designed for personal use. 
+# TaapiClient
 
-It currently supports only the exchanges listed in the TaapiExchange.cs file and the indicators listed in the TaapiIndicatorType.cs file. 
-These files define the available exchanges and indicators that can be used with the library. 
-If you want to use a different exchange or indicator, you would need to modify the library accordingly.
+## Overview
 
+The `TaapiClient` class is designed to interact with the Taapi.io API for fetching various indicator values, posting bulk indicator requests, and managing API rate limits. It provides asynchronous methods for making API requests and includes error handling for common HTTP and API errors.
 
+Suported exchanges:
+- Binance
+- Binance Futures
+- BinanceUs
+- Coinbase
+- Kraken
+- Bitstamp
+- WhiteBIT
+- ByBit
+- GateIo
 
-# TaapiLibrary Documentation
+Supported indicators:
+- RSI
+- macd
+- sma
+- ema
+- stochastic
+- bbands
+- supertrend
+- atr
+- stochrsi
+- ma
+- dmi
 
-The TaapiLibrary is a C# library that provides a client for interacting with the Taapi API. It allows you to retrieve indicator values and perform bulk indicator requests.
+---
 
-## TaapiClient Class
+## Properties
 
-The `TaapiClient` class is the main class in the TaapiLibrary. It provides methods for interacting with the Taapi API.
+| Name                 | Type         | Description                                                                                  | Default                      |
+|----------------------|--------------|----------------------------------------------------------------------------------------------|------------------------------|
+| `_httpClient`         | `HttpClient` | A static instance used for making HTTP requests to the Taapi API.                             | N/A                          |
+| `_baseUrl`            | `string`     | The base URL of the Taapi API.                                                                | `"https://api.taapi.io"`      |
+| `_retryAfterSeconds`  | `int`        | The number of seconds to wait before retrying a request after a rate limit is exceeded.       | `60`                         |
 
-### Constructors
+---
 
-#### `TaapiClient(int retryAfterSeconds = 60)`
+## Constructors
 
-- Initializes a new instance of the `TaapiClient` class with optional parameters for the base URL and retry delay.
-- Parameters:
-  - `baseUrl` (optional): The base URL for the Taapi API. Default value is "https://api.taapi.io".
-  - `retryAfterSeconds` (optional): The number of seconds to wait before retrying a request if the rate limit is exceeded. Default value is 60 seconds.
+### `TaapiClient(string baseUrl = "https://api.taapi.io", int retryAfterSeconds = 60)`
 
-### Public
-### Public Methods
+Initializes a new instance of the `TaapiClient` class.
 
-#### `Task<TaapiIndicatorValuesResponse> GetIndicatorAsync(string apiKey, string symbol, TaapiExchange exchange, TaapiCandlesInterval candlesInterval, TaapiIndicatorPropertiesRequest directParametersRequest)`
+- **Parameters**:
+  - `baseUrl`: The base URL of the Taapi API (default: `"https://api.taapi.io"`).
+  - `retryAfterSeconds`: Time in seconds to wait before retrying after rate limit (default: `60`).
 
-- Retrieves indicator values for a specific symbol.
-- Parameters:
-  - `apiKey`: The API key for accessing the Taapi API.
-  - `symbol`: The symbol for which to retrieve indicator values.
+---
+
+## Methods
+
+### `Task<TaapiIndicatorValuesResponse> GetIndicatorAsync(string apiKey, string symbol, TaapiExchange exchange, TaapiCandlesInterval candlesInterval, TaapiIndicatorPropertiesRequest directParametersRequest)`
+
+Fetches indicator values asynchronously.
+
+- **Parameters**:
+  - `apiKey`: The API key used for authentication (must not be null or empty).
+  - `symbol`: The symbol for which the indicator is fetched (must not be null or empty).
   - `exchange`: The exchange on which the symbol is traded.
-  - `candlesInterval`: The interval of the candles for the indicator calculation.
-  - `directParametersRequest`: The request object containing the indicator properties.
-- Returns:
-  - A `Task` that represents the asynchronous operation. The task result contains the indicator values as a `TaapiIndicatorValuesResponse` object.
+  - `candlesInterval`: The time interval for the candles.
+  - `directParametersRequest`: The properties for the requested indicator (must not be null).
 
-#### `Task<List<TaapiBulkResponse>> PostBulkIndicatorsAsync(TaapiBulkRequest requests)`
+- **Returns**:  
+  A `Task<TaapiIndicatorValuesResponse>` representing the fetched indicator values.
 
-- Performs bulk indicator requests.
-- Parameters:
+- **Exceptions**:
+  - `ArgumentException`: If required parameters are null or empty.
+  - `UnauthorizedAccessException`: If the API key is invalid.
+  - `RateLimitExceededException`: If the rate limit is exceeded.
+  - Other exceptions for HTTP request errors.
+
+---
+
+### `[Obsolete] Task<List<TaapiBulkResponse>> PostBulkIndicatorsAsync(TaapiBulkRequest requests)`
+
+**Deprecated.** Posts multiple indicator requests in bulk. Use `GetBulkIndicatorsResults` instead.
+
+- **Parameters**:
+  - `requests`: The request object containing multiple indicator requests.
+
+- **Returns**:  
+  A `Task<List<TaapiBulkResponse>>` containing the bulk response.
+
+- **Exceptions**:  
+  Same as `GetIndicatorAsync`.
+
+---
+
+### `Task<List<ITaapiIndicatorResults>> GetBulkIndicatorsResults(TaapiBulkRequest requests)`
+
+Fetches multiple indicator results asynchronously in bulk.
+
+- **Parameters**:
   - `requests`: The bulk request object containing multiple indicator requests.
-- Returns:
-  - A `Task` that represents the asynchronous operation. The task result contains a list of `TaapiBulkResponse` objects, each representing the result of an individual indicator request.
 
-### Exception Handling
+- **Returns**:  
+  A `Task<List<ITaapiIndicatorResults>>` containing the results of the requested indicators.
 
-The `TaapiClient` class throws various exceptions to handle different error scenarios. These exceptions include:
-- `ArgumentException`: Thrown when invalid arguments are passed to the methods.
-- `UnauthorizedAccessException`: Thrown when the API key is invalid or unauthorized.
-- `RateLimitExceededException`: Thrown when the rate limit is exceeded.
-- `HttpRequestException`: Thrown when an HTTP request error occurs.
-- `JsonException`: Thrown when a JSON serialization or deserialization error occurs.
-- `InvalidOperationException`: Thrown when an invalid operation error occurs.
-- `TaskCanceledException`: Thrown when a task is canceled.
-- `UriFormatException`: Thrown when a URI format error occurs.
-- `Exception`: Thrown for any other unexpected error.
+- **Exceptions**:  
+  Same as `GetIndicatorAsync`.
+
+---
+
+### `TaapiBulkRequest CreateBulkRequest(string apiKey, List<TaapiBulkConstruct> bulkConstructList)`
+
+Creates a bulk request for fetching multiple indicators.
+
+- **Parameters**:
+  - `apiKey`: The API key for authentication (must not be null or empty).
+  - `bulkConstructList`: A list of bulk constructs for the indicators (must not be null).
+
+- **Returns**:  
+  A `TaapiBulkRequest` object.
+
+- **Exceptions**:
+  - `ArgumentException`: If parameters are null or empty.
+
+---
+
+### `TaapiBulkConstruct CreateBulkConstruct(TaapiExchange exchange, string symbol, TaapiCandlesInterval candlesInterval, List<ITaapiIndicatorProperties> indicatorList)`
+
+Creates a bulk construct for a specific exchange, symbol, and interval, and includes a list of indicators.
+
+- **Parameters**:
+  - `exchange`: The exchange where the symbol is traded.
+  - `symbol`: The symbol for which to create the bulk construct (must not be null or empty).
+  - `candlesInterval`: The interval for the candles.
+  - `indicatorList`: A list of indicators (must not be null or empty).
+
+- **Returns**:  
+  A `TaapiBulkConstruct` object.
+
+- **Exceptions**:
+  - `ArgumentException`: If parameters are null or empty.
+
+---
+
+## Exceptions
+
+- **`UnauthorizedAccessException`**: Thrown if the API key is invalid or unauthorized.
+- **`RateLimitExceededException`**: Thrown when the API's rate limit is exceeded.
+- **`ArgumentException`**: Thrown if invalid or missing parameters are provided.
+- **`HttpRequestException`**: Thrown when there is an error in the HTTP request.
+- **`JsonException`**: Thrown when JSON serialization/deserialization fails.
+- **`UriFormatException`**: Thrown if the URI format is invalid.
+
+---
 
 ## Example Usage
 
@@ -67,180 +159,140 @@ Here is an example of how to use the `TaapiClient` class to retrieve indicator v
 Make sure to replace `"YOUR_API_KEY"` with your actual Taapi API key.
 
 ```csharp
+
 using TaapiLibrary;
 using TaapiLibrary.Contracts.Requests;
+using TaapiLibrary.Contracts.Requests.Interfaces;
+using TaapiLibrary.Contracts.Response.Bulk.Interfaces.Indicators;
 using TaapiLibrary.Enums;
+using TaapiLibrary.Models.Indicators.Properties;
 
 
-string _secret = "YOUR_API_KEY";
+Console.WriteLine("Taapi Test App");
 
-// Create a new Taapi Client
+
+string TAAPI_API_KEY = "YOUR_API_KEY";
+
 TaapiClient taapiClient = new TaapiClient();
 
-// Get the indicator by calling the GetIndicatorAsync method
- var dataBnb = await taapiClient.GetIndicatorAsync(_secret, "BNB/USDT", TaapiExchange.Binance, TaapiCandlesInterval.OneMinute, 
-                                                    new TaapiIndicatorPropertiesRequest(TaapiIndicatorType.SuperTrend, TaapiChart.Candles, period: 10, multiplier: 1));
 
-
- // Set Taapi bulk request
-
-#region BNB/USDT
-// Create a 3 new Taapi indicator requests
-TaapiIndicatorPropertiesRequest indicatorRequest_BNB_1 = new TaapiIndicatorPropertiesRequest(
-    TaapiIndicatorType.SuperTrend, 
-    TaapiChart.Candles,
-    id: "BNB_superTrend_1",
-    period: 10, 
-    multiplier: 1
-    );
-TaapiIndicatorPropertiesRequest indicatorRequest_BNB_2 = new TaapiIndicatorPropertiesRequest(
-    TaapiIndicatorType.SuperTrend,
-    TaapiChart.Candles,
-    id: "BNB_superTrend_2",
-    period: 11,
-    multiplier: 2
-    );
-TaapiIndicatorPropertiesRequest indicatorRequest_BNB_3 = new TaapiIndicatorPropertiesRequest(
-    TaapiIndicatorType.SuperTrend,
-    TaapiChart.Candles,
-    id: "BNB_superTrend_3",
-    period: 12,
-    multiplier: 3
-    );
-
-List<TaapiIndicatorPropertiesRequest> indicators_BNB = new List<TaapiIndicatorPropertiesRequest> {
-    indicatorRequest_BNB_1,
-    indicatorRequest_BNB_2,
-    indicatorRequest_BNB_3
+// Create BNBUSDT list of indicators properties and add properties for each indicator
+List<ITaapiIndicatorProperties> bnb_PropertiesList = new List<ITaapiIndicatorProperties>();
+// Rsi propertie
+RsiIndicatorPropertie rsi_bnb = new RsiIndicatorPropertie { 
+    Id = "rsi_bnb",
+    Chart = TaapiChart.Candles,
+    Backtrack = 0,
+    Period = 10,
 };
-
-#endregion
-
-#region SOL/USDT
-
-// Create a 3 new Taapi indicator requests
-TaapiIndicatorPropertiesRequest indicatorRequest_SOL_1 = new TaapiIndicatorPropertiesRequest(
-    TaapiIndicatorType.SuperTrend,
-    TaapiChart.Candles,
-    id: "SOL_superTrend_1",
-    period: 10,
-    multiplier: 1
-    );
-TaapiIndicatorPropertiesRequest indicatorRequest_SOL_2 = new TaapiIndicatorPropertiesRequest(
-    TaapiIndicatorType.SuperTrend,
-    TaapiChart.Candles,
-    id: "SOL_superTrend_2",
-    period: 11,
-    multiplier: 2
-    );
-TaapiIndicatorPropertiesRequest indicatorRequest_SOL_3 = new TaapiIndicatorPropertiesRequest(
-    TaapiIndicatorType.SuperTrend,
-    TaapiChart.Candles,
-    id: "SOL_superTrend_3",
-    period: 12,
-    multiplier: 3
-    );
-
-List<TaapiIndicatorPropertiesRequest> indicators_SOL = new List<TaapiIndicatorPropertiesRequest> {  
-    indicatorRequest_SOL_1,
-    indicatorRequest_SOL_2,
-    indicatorRequest_SOL_3
+bnb_PropertiesList.Add(rsi_bnb);
+// SuperTrend propertie
+SuperTrendIndicatorProperties superTrend_bnb = new SuperTrendIndicatorProperties {
+    Id = "supertrend_bnb",
+    Chart = TaapiChart.Candles,
+    Backtrack = 1,
+    Period = 10,
+    Multiplier = 3,
 };
-
-#endregion
-
-#region BTC/USDT
-
-// Create a 3 new Taapi indicator requests
-TaapiIndicatorPropertiesRequest indicatorRequest_BTC_1 = new TaapiIndicatorPropertiesRequest(
-    TaapiIndicatorType.SuperTrend,
-    TaapiChart.Candles,
-    id: "BTC_superTrend_1",
-    period: 10,
-    multiplier: 1
-    );
-TaapiIndicatorPropertiesRequest indicatorRequest_BTC_2 = new TaapiIndicatorPropertiesRequest(
-    TaapiIndicatorType.SuperTrend,
-    TaapiChart.Candles,
-    id: "BTC_superTrend_2",
-    period: 11,
-    multiplier: 2
-    );
-TaapiIndicatorPropertiesRequest indicatorRequest_BTC_3 = new TaapiIndicatorPropertiesRequest(
-    TaapiIndicatorType.SuperTrend,
-    TaapiChart.Candles,
-    id: "BTC_superTrend_3",
-    period: 12,
-    multiplier: 3
-    );
-
-List<TaapiIndicatorPropertiesRequest> indicators_BTC = new List<TaapiIndicatorPropertiesRequest> {
-    indicatorRequest_BTC_1,
-    indicatorRequest_BTC_2,
-    indicatorRequest_BTC_3
+bnb_PropertiesList.Add(superTrend_bnb);
+// Stoch rsi propertie
+StochRsiIndicatorProperties stochRsi_bnb = new StochRsiIndicatorProperties {
+    Id = "stochrsi_bnb",
+    Chart = TaapiChart.Candles,
+    Backtrack = 0,
+    ChartGaps = false,
+    DPeriod = 10,
+    KPeriod = 9,
+    RsiPeriod = 11,
+    StochasticPeriod = 12,
 };
+bnb_PropertiesList.Add(stochRsi_bnb);
 
-#endregion
+// Create Binance Futures BNBUSDT Bulk Construct from indicators properties ( rsi, superTrend, stochRsi,... )
+var bnb_Construct = taapiClient.CreateBulkConstruct(TaapiExchange.BinanceFutures, "BNB/USDT", TaapiCandlesInterval.OneMinute, bnb_PropertiesList);
 
-#region ETH/USDT
 
-// Create a 3 new Taapi indicator requests
-TaapiIndicatorPropertiesRequest indicatorRequest_ETH_1 = new TaapiIndicatorPropertiesRequest(
-    TaapiIndicatorType.SuperTrend,
-    TaapiChart.Candles,
-    id: "ETH_superTrend_1",
-    period: 10,
-    multiplier: 1
-    );
-TaapiIndicatorPropertiesRequest indicatorRequest_ETH_2 = new TaapiIndicatorPropertiesRequest(
-    TaapiIndicatorType.SuperTrend,
-    TaapiChart.Candles,
-    id: "ETH_superTrend_2",
-    period: 11,
-    multiplier: 2
-    );
-TaapiIndicatorPropertiesRequest indicatorRequest_ETH_3 = new TaapiIndicatorPropertiesRequest(
-    TaapiIndicatorType.SuperTrend,
-    TaapiChart.Candles,
-    id: "ETH_superTrend_3",
-    period: 12,
-    multiplier: 3
-    );
 
-List<TaapiIndicatorPropertiesRequest> indicators_ETH = new List<TaapiIndicatorPropertiesRequest> {
-    indicatorRequest_ETH_1,
-    indicatorRequest_ETH_2,
-    indicatorRequest_ETH_3
+// Create BTCUSDT list of indicators properties and add properties for each indicator
+List<ITaapiIndicatorProperties> btc_PropertiesList = new List<ITaapiIndicatorProperties>();
+// MACD propertie
+MacdIndicatorPropertie macd_bnb = new MacdIndicatorPropertie {
+    Id = "macd_bnb",
+    Chart = TaapiChart.Heikinashi,
+    Backtrack = 0,
+    OptInFastPeriod = 10,
+    OptInSignalPeriod = 11,
+    OptInSlowPeriod = 12,
 };
+btc_PropertiesList.Add(macd_bnb);
 
-#endregion
-
-
-// Create a max 3 new Taapi bulk construct
-TaapiBulkConstruct bulkConstruct_1 = new TaapiBulkConstruct(TaapiExchange.Binance, "BNB/USDT", TaapiCandlesInterval.OneMinute, indicators_BNB);
-TaapiBulkConstruct bulkConstruct_2 = new TaapiBulkConstruct(TaapiExchange.Binance, "SOL/USDT", TaapiCandlesInterval.OneMinute, indicators_SOL);
-TaapiBulkConstruct bulkConstruct_3 = new TaapiBulkConstruct(TaapiExchange.Binance, "BTC/USDT", TaapiCandlesInterval.OneMinute, indicators_BTC);
-
-List<TaapiBulkConstruct> bulkConstructs = new List<TaapiBulkConstruct> {
-    bulkConstruct_1,
-    bulkConstruct_2,
-    bulkConstruct_3
-};
-
-
-// Create a new Taapi bulk request
-TaapiBulkRequest bulkRequest = new TaapiBulkRequest( _secret, bulkConstructs);
+// Create Binance Futures BTCUSDT 5 min candle interval Bulk Construct from indicators properties ( MACD,... )
+var btc_Construct = taapiClient.CreateBulkConstruct(TaapiExchange.BinanceFutures, "BTC/USDT", TaapiCandlesInterval.FiveMinutes, btc_PropertiesList);
 
 
 
-// Get the bulk indicators by calling the PostBulkIndicatorsAsync method
-var bulkIndicators = taapiClient.PostBulkIndicatorsAsync(bulkRequest).Result;
+List<TaapiBulkConstruct> constructs = new List<TaapiBulkConstruct>();
+constructs.Add(bnb_Construct);
+constructs.Add(btc_Construct);
+
+
+// Get Bulk request for all indicators ( max 3 Constructs )
+var bulk = taapiClient.CreateBulkRequest(TAAPI_API_KEY, constructs);
+
+
+// Get results for indicators
+var results = await taapiClient.GetBulkIndicatorsResults(bulk);
+
+
+// Print results
+if(results?.Count > 0) {
+    foreach (var result in results) {
+
+        // Get symbol from Id
+        string symbol = result.Id.Split("_")[1].ToUpper();
+
+        // RSI
+        if (result is IRsiIndicatorResults rsiResult) {
+            Console.WriteLine($"Symbol: {symbol} - RSI: {rsiResult.Value}");
+        }
+        // SuperTrend
+        else if (result is ISuperTrendIndicatorResults superTrendResult) {
+            Console.WriteLine($"Symbol: {symbol} - SuperTrend: {superTrendResult.Value} - {superTrendResult.ValueAdvice}");
+        }
+        // Stoch RSI
+        else if (result is IStochRsiIndicatorResults stochRsiResult) {
+            Console.WriteLine($"Symbol: {symbol} - " +
+                $"Stoch RSI FastK:{stochRsiResult.ValueFastK} - FastD:{stochRsiResult.ValueFastD}");
+        }
+        // MACD
+        else if (result is IMacdIndicatorResults macdResult) {
+            Console.WriteLine($"Symbol: {symbol} - MACD: {macdResult.ValueMACD} - Hist:{macdResult.ValueMACDHist} - Signal:{macdResult.ValueMACDSignal}");
+        }
+
+
+    }// foreach
+}
+
+Console.WriteLine("End of program");
 
 ```
+
+
 
 # Changelog
 
 This section outlines the changes and improvements made in each version of the TaapiLibrary.
+
+
+## Version 1.0.4 - 2023-07-24
+
+### Added
+- `Task<List<ITaapiIndicatorResults>> GetBulkIndicatorsResults(TaapiBulkRequest requests)`
+- `TaapiBulkConstruct CreateBulkConstruct(TaapiExchange exchange, string symbol, TaapiCandlesInterval candlesInterval, List<ITaapiIndicatorProperties> indicatorList)`
+- `TaapiBulkRequest CreateBulkRequest(string apiKey, List<TaapiBulkConstruct> bulkConstructList)`
+
+### Deprecated
+- `[Obsolete] Task<List<TaapiBulkResponse>> PostBulkIndicatorsAsync(TaapiBulkRequest requests)`
 
 
 ## Version 1.0.3-alpha - 2023-07-18
@@ -286,7 +338,6 @@ This section outlines the changes and improvements made in each version of the T
 - Support for basic indicator retrieval and bulk indicator requests.
 
 
+![Bulk Request](BulkRequest.png)
 
-This is just a basic example. You can customize the symbol, exchange, candles interval, and indicator properties according to your needs.
-
-That's it! You now have an overview of the TaapiLibrary and how to use the `TaapiClient` class to interact with the Taapi API.
+![Bulk Response](BulkResponse.png)

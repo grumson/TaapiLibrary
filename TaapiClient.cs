@@ -1,10 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using TaapiLibrary.Contracts.Requests;
 using TaapiLibrary.Contracts.Requests.Interfaces;
 using TaapiLibrary.Contracts.Requests.Interfaces.Indicators;
@@ -20,8 +16,19 @@ public class TaapiClient {
 
     #region *** PROPERTIES ***
 
+    /// <summary>
+    /// HttpClient instance for making HTTP requests.
+    /// </summary>
     private static readonly HttpClient _httpClient = new HttpClient();
-    private readonly string _baseUrl = "https://api.taapi.io";
+
+    /// <summary>
+    /// Base URL for the Taapi API.
+    /// </summary>
+    private readonly string _baseUrl;
+
+    /// <summary>
+    /// Number of seconds to wait before retrying a failed request.
+    /// </summary>
     private readonly int _retryAfterSeconds;
 
     #endregion
@@ -42,7 +49,15 @@ public class TaapiClient {
 
     #region *** PUBLIC METHODS ***
 
-    // Get Indicator directly
+    /// <summary>
+    /// Fetches indicator values asynchronously.
+    /// </summary>
+    /// <param name="apiKey">API key for authentication.</param>
+    /// <param name="symbol">Symbol for which to fetch the indicator.</param>
+    /// <param name="exchange">Exchange on which the symbol is traded.</param>
+    /// <param name="candlesInterval">Interval for the candles.</param>
+    /// <param name="directParametersRequest">Parameters for the indicator request.</param>
+    /// <returns>Indicator values response.</returns>
     public async Task<TaapiIndicatorValuesResponse> GetIndicatorAsync(string apiKey, string symbol, TaapiExchange exchange, TaapiCandlesInterval candlesInterval, TaapiIndicatorPropertiesRequest directParametersRequest ) {
 
         // check if the symbol is null or empty
@@ -141,7 +156,11 @@ public class TaapiClient {
     }//end GetIndicatorAsync()
 
 
-    // Post Bulk Indicators
+    // <summary>
+    /// Posts bulk indicators asynchronously. This method is deprecated.
+    /// </summary>
+    /// <param name="requests">Bulk request containing multiple indicator requests.</param>
+    /// <returns>List of bulk responses.</returns>
     [Obsolete("GetIndicatorAsync is deprecated, please use the new method GetBulkIndicatorsResults instead.", true)]
     public async Task<List<TaapiBulkResponse>> PostBulkIndicatorsAsync(TaapiBulkRequest requests) {
 
@@ -231,7 +250,11 @@ public class TaapiClient {
     }//end PostBulkIndicatorsAsync()
 
 
-    // Get Bulk Indicators results
+    /// <summary>
+    /// Fetches bulk indicator results asynchronously.
+    /// </summary>
+    /// <param name="requests">Bulk request containing multiple indicator requests.</param>
+    /// <returns>List of indicator results.</returns>
     public async Task<List<ITaapiIndicatorResults>> GetBulkIndicatorsResults(TaapiBulkRequest requests) {
 
 
@@ -276,17 +299,8 @@ public class TaapiClient {
             // Deserialize the response
             TaapiBulkResponse? taapiBulkResponse = JsonConvert.DeserializeObject<TaapiBulkResponse>(jsonString);
 
-            // Map the response to the ITaapiIndicatorResults
-            List<ITaapiIndicatorResults> taapiIndicatorResultsList = new List<ITaapiIndicatorResults>();
-            if(taapiBulkResponse?.data?.Count > 0) {
-                foreach (var taapiBulkDataResponse in taapiBulkResponse.data) {
-
-                    ITaapiIndicatorResults taapiIndicatorResults = MapIndicatorResults(taapiBulkDataResponse);
-
-                    taapiIndicatorResultsList.Add(taapiIndicatorResults);
-                }
-            }
-
+            // Get the indicators results from the response
+            List<ITaapiIndicatorResults> taapiIndicatorResultsList = GetIndicatorResults(taapiBulkResponse!);
 
             // Return the indicators results
             return taapiIndicatorResultsList;
@@ -326,7 +340,12 @@ public class TaapiClient {
     }//end GetBulkIndicatorsResults()
 
 
-    // Create a Bulk Request
+    /// <summary>
+    /// Creates a bulk request for multiple indicators.
+    /// </summary>
+    /// <param name="apiKey">API key for authentication.</param>
+    /// <param name="bulkConstructList">List of bulk constructs.</param>
+    /// <returns>Bulk request object.</returns>
     public TaapiBulkRequest CreateBulkRequest(string apiKey, List<TaapiBulkConstruct> bulkConstructList) {
 
 
@@ -352,7 +371,14 @@ public class TaapiClient {
     }//end CreateBulkRequest()
 
 
-    // Create a Bulk Construct
+    /// <summary>
+    /// Creates a bulk construct for a specific exchange, symbol, and interval.
+    /// </summary>
+    /// <param name="exchange">Exchange on which the symbol is traded.</param>
+    /// <param name="symbol">Symbol for which to create the construct.</param>
+    /// <param name="candlesInterval">Interval for the candles.</param>
+    /// <param name="indicatorList">List of indicators to include in the construct.</param>
+    /// <returns>Bulk construct object.</returns>
     public TaapiBulkConstruct CreateBulkConstruct(TaapiExchange exchange, string symbol, TaapiCandlesInterval candlesInterval, List<ITaapiIndicatorProperties> indicatorList) {
 
 
@@ -384,65 +410,105 @@ public class TaapiClient {
         return bulkConstruct;
     }//end CreateBulkConstruct()
 
-
-    // Get Indicator Results from Bulk Response list
-    public List<ITaapiIndicatorResults> GetIndicatorResults(List<TaapiBulkResponse> taapiBulkResponseList) {
-
-        List<ITaapiIndicatorResults> taapiIndicatorResultsList = new List<ITaapiIndicatorResults>();
-
-        foreach (var taapiBulkResponse in taapiBulkResponseList) {
-
-            foreach (var taapiBulkDataResponse in taapiBulkResponse.data) {
-
-                ITaapiIndicatorResults taapiIndicatorResults = MapIndicatorResults(taapiBulkDataResponse);
-
-                taapiIndicatorResultsList.Add(taapiIndicatorResults);
-            }
-        }
-
-        return taapiIndicatorResultsList;
-    }//end GetIndicatorResults()
-
-
     #endregion
 
 
 
     #region *** PRIVATE METHODS ***
 
-    // Map ITaapiIndicatorRequest to TaapiIndicatorPropertiesRequest
+    /// <summary>
+    /// Maps an indicator request to a TaapiIndicatorPropertiesRequest object.
+    /// </summary>
+    /// <param name="indicatorRequest">Indicator request to map.</param>
+    /// <returns>Mapped TaapiIndicatorPropertiesRequest object.</returns>
     private TaapiIndicatorPropertiesRequest MapIndicatorRequest(ITaapiIndicatorProperties indicatorRequest) {
 
         TaapiIndicatorPropertiesRequest taapiIndicatorPropertiesRequest = null!;
             
         // RSI
-        if (indicatorRequest is IRsiIndicatorProperties rsiIndicatorResponse) {
+        if (indicatorRequest is IRsiIndicatorProperties rsiIndicatorProperties) {
 
             taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
-                Period = rsiIndicatorResponse.Period,
+                Period = rsiIndicatorProperties.Period,
             };
         }
         // MACD
-        else if (indicatorRequest is IMacdIndicatorProperties macdIndicatorResponse) {
+        else if (indicatorRequest is IMacdIndicatorProperties macdIndicatorProperties) {
 
             taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
-                OptInFastPeriod = macdIndicatorResponse.OptInFastPeriod,
-                OptInSlowPeriod = macdIndicatorResponse.OptInSlowPeriod,
-                OptInSignalPeriod = macdIndicatorResponse.OptInSignalPeriod,
+                OptInFastPeriod = macdIndicatorProperties.OptInFastPeriod,
+                OptInSlowPeriod = macdIndicatorProperties.OptInSlowPeriod,
+                OptInSignalPeriod = macdIndicatorProperties.OptInSignalPeriod,
             };
         }
         // SMA
-        else if (indicatorRequest is ISmaIndicatorProperties smaIndicatorResponse) {
+        else if (indicatorRequest is ISmaIndicatorProperties smaIndicatorProperties) {
 
             taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
-                Period = smaIndicatorResponse.Period,
+                Period = smaIndicatorProperties.Period,
             };
         }
         // EMA
-        else if (indicatorRequest is IEmaIndicatorProperties emaIndicatorResponse) {
+        else if (indicatorRequest is IEmaIndicatorProperties emaIndicatorProperties) {
 
             taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
-                Period = emaIndicatorResponse.Period,
+                Period = emaIndicatorProperties.Period,
+            };
+        }
+        // STOCH
+        else if (indicatorRequest is IStochIndicatorProperties stochasticIndicatorProperties) {
+
+            taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
+                KPeriod = stochasticIndicatorProperties.KPeriod,
+                DPeriod = stochasticIndicatorProperties.DPeriod,
+                KSmooth = stochasticIndicatorProperties.KSmooth,
+            };
+        }
+        // BBANDS
+        else if (indicatorRequest is IBbandsIndicatorProperties bbandsIndicatorProperties) {
+
+            taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
+                Period = bbandsIndicatorProperties.Period,
+                StdDev = bbandsIndicatorProperties.Stddev,
+            };
+        }
+        // SUPER TREND
+        else if (indicatorRequest is ISuperTrendIndicatorProperties superTrendIndicatorProperties) {
+
+            taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
+                Period = superTrendIndicatorProperties.Period,
+                Multiplier = superTrendIndicatorProperties.Multiplier,
+            };
+        }
+        // ATR
+        else if (indicatorRequest is IAtrIndicatorProperties atrIndicatorProperties) {
+
+            taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
+                Period = atrIndicatorProperties.Period,
+            };
+        }
+        // STOCH RSI
+        else if (indicatorRequest is IStochRsiIndicatorProperties stochRsiIndicatorProperties) {
+
+            taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
+                KPeriod = stochRsiIndicatorProperties.KPeriod,
+                DPeriod = stochRsiIndicatorProperties.DPeriod,
+                RsiPeriod = stochRsiIndicatorProperties.RsiPeriod,
+                StochasticPeriod = stochRsiIndicatorProperties.StochasticPeriod,
+            };
+        }
+        // MA
+        else if (indicatorRequest is IMaIndicatorProperties maIndicatorProperties) {
+
+            taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
+                Period = maIndicatorProperties.Period,
+            };
+        }
+        // DMI
+        else if (indicatorRequest is IDmiIndicatorProperties dmiIndicatorProperties) {
+
+            taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
+                Period = dmiIndicatorProperties.Period,
             };
         }
         // Not implemented
@@ -456,7 +522,11 @@ public class TaapiClient {
     }//end MapIndicatorRequest()
 
 
-    // Map TaapiBulkDataResponse to ITaapiIndicatorResults
+    /// <summary>
+    /// Maps a bulk data response to an indicator results object.
+    /// </summary>
+    /// <param name="taapiBulkDataResponse">Bulk data response to map.</param>
+    /// <returns>Mapped indicator results object.</returns>
     private ITaapiIndicatorResults MapIndicatorResults(TaapiBulkDataResponse taapiBulkDataResponse) {
 
         ITaapiIndicatorResults taapiIndicatorResults = null!;
@@ -503,6 +573,83 @@ public class TaapiClient {
                 Value = taapiBulkDataResponse.result.value,
             };
         }
+        // STOCH
+        else if (taapiBulkDataResponse.indicator == TaapiIndicatorType.Stochastic.GetDescription()) {
+
+            taapiIndicatorResults = new StochIndicatorResults {
+                Id = taapiBulkDataResponse.id,
+                Indicator = taapiBulkDataResponse.indicator,
+                Errors = taapiBulkDataResponse.errors,
+                ValueK = taapiBulkDataResponse.result.valueK,
+                ValueD = taapiBulkDataResponse.result.valueD,
+            };
+        }
+        // BBANDS
+        else if (taapiBulkDataResponse.indicator == TaapiIndicatorType.BBands.GetDescription()) {
+
+            taapiIndicatorResults = new BbandsIndicatorResults {
+                Id = taapiBulkDataResponse.id,
+                Indicator = taapiBulkDataResponse.indicator,
+                Errors = taapiBulkDataResponse.errors,
+                ValueUpperBand = taapiBulkDataResponse.result.valueUpperBand,
+                ValueMiddleBand = taapiBulkDataResponse.result.valueMiddleBand,
+                ValueLowerBand = taapiBulkDataResponse.result.valueLowerBand,
+            };
+        }
+        // SUPER TREND
+        else if (taapiBulkDataResponse.indicator == TaapiIndicatorType.SuperTrend.GetDescription()) {
+
+            taapiIndicatorResults = new SuperTrendIndicatorResults {
+                Id = taapiBulkDataResponse.id,
+                Indicator = taapiBulkDataResponse.indicator,
+                Errors = taapiBulkDataResponse.errors,
+                Value = taapiBulkDataResponse.result.value,
+                ValueAdvice = taapiBulkDataResponse.result.valueAdvice,
+            };
+        }
+        // ATR
+        else if (taapiBulkDataResponse.indicator == TaapiIndicatorType.Atr.GetDescription()) {
+
+            taapiIndicatorResults = new AtrIndicatorResults {
+                Id = taapiBulkDataResponse.id,
+                Indicator = taapiBulkDataResponse.indicator,
+                Errors = taapiBulkDataResponse.errors,
+                Value = taapiBulkDataResponse.result.value,
+            };
+        }
+        // STOCH RSI
+        else if (taapiBulkDataResponse.indicator == TaapiIndicatorType.StochRsi.GetDescription()) {
+
+            taapiIndicatorResults = new StochRsiIndicatorResults {
+                Id = taapiBulkDataResponse.id,
+                Indicator = taapiBulkDataResponse.indicator,
+                Errors = taapiBulkDataResponse.errors,
+                ValueFastK = taapiBulkDataResponse.result.valueFastK,
+                ValueFastD = taapiBulkDataResponse.result.valueFastD,
+            };
+        }
+        // MA
+        else if (taapiBulkDataResponse.indicator == TaapiIndicatorType.Ma.GetDescription()) {
+
+            taapiIndicatorResults = new MaIndicatorResults {
+                Id = taapiBulkDataResponse.id,
+                Indicator = taapiBulkDataResponse.indicator,
+                Errors = taapiBulkDataResponse.errors,
+                Value = taapiBulkDataResponse.result.value,
+            };
+        }
+        // DMI
+        else if (taapiBulkDataResponse.indicator == TaapiIndicatorType.Dmi.GetDescription()) {
+
+            taapiIndicatorResults = new DmiIndicatorResults {
+                Id = taapiBulkDataResponse.id,
+                Indicator = taapiBulkDataResponse.indicator,
+                Errors = taapiBulkDataResponse.errors,
+                Adx = taapiBulkDataResponse.result.Adx,
+                Pdi = taapiBulkDataResponse.result.Pdi,
+                Mdi = taapiBulkDataResponse.result.Mdi,
+            };
+        }
         // Not implemented
         else {
 
@@ -511,6 +658,28 @@ public class TaapiClient {
 
         return taapiIndicatorResults;
     }//end MapIndicatorResults()
+
+
+    /// <summary>
+    /// Extracts indicator results from a bulk response.
+    /// </summary>
+    /// <param name="taapiBulkResponse">Bulk response containing indicator data.</param>
+    /// <returns>List of indicator results.</returns>
+    private List<ITaapiIndicatorResults> GetIndicatorResults(TaapiBulkResponse taapiBulkResponse) {
+
+        List<ITaapiIndicatorResults> taapiIndicatorResultsList = new List<ITaapiIndicatorResults>();
+
+        if (taapiBulkResponse?.data?.Count > 0) {
+            foreach (var taapiBulkDataResponse in taapiBulkResponse.data) {
+
+                ITaapiIndicatorResults taapiIndicatorResults = MapIndicatorResults(taapiBulkDataResponse);
+
+                taapiIndicatorResultsList.Add(taapiIndicatorResults);
+            }
+        }
+
+        return taapiIndicatorResultsList;
+    }//end GetIndicatorResults()
 
     #endregion
 

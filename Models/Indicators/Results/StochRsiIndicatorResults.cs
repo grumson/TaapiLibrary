@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TaapiLibrary.Contracts.Response.Bulk.Interfaces.Indicators;
 
 namespace TaapiLibrary.Models.Indicators.Results;
-public class RsiIndicatorResults : IRsiIndicatorResults {
+public class StochRsiIndicatorResults : IStochRsiIndicatorResults {
 
 
     #region *** PROPERTIES ***
@@ -14,7 +14,8 @@ public class RsiIndicatorResults : IRsiIndicatorResults {
     public string Id { get; set; } = string.Empty;
     public string Indicator { get; set; } = string.Empty;
     public List<string> Errors { get; set; } = new List<string>();
-    public double? Value { get; set; }
+    public double? ValueFastK { get; set; }
+    public double? ValueFastD { get; set; }
 
     #endregion
 
