@@ -284,6 +284,12 @@ Console.WriteLine("End of program");
 This section outlines the changes and improvements made in each version of the TaapiLibrary.
 
 
+## Version 1.0.5 - 2023-07-26
+
+### Added
+- defoult values for Indicator Properties
+
+
 ## Version 1.0.4 - 2023-07-24
 
 ### Added

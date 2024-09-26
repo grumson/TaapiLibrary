@@ -22,6 +22,9 @@ public class BbandsIndicatorProperties : IBbandsIndicatorProperties {
     public int? Period { get; set; }
     public int? Stddev { get; set; }
 
+    public const int DefoultPeriod = 20;
+    public const int DefoultStddev = 2;
+
     #endregion
 
 

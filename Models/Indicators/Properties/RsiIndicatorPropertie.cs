@@ -20,6 +20,8 @@ public class RsiIndicatorPropertie : IRsiIndicatorProperties {
     public string? Results { get; set; }
     public int? Period { get; set; }
 
+    public const int DefaultPeriod = 14;
+
     #endregion
 
 

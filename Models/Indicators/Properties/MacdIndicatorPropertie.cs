@@ -18,9 +18,14 @@ public class MacdIndicatorPropertie : IMacdIndicatorProperties {
     public int? Backtrack { get; set; }
     public bool? ChartGaps { get; set; }
     public string? Results { get; set; }
+
     public int? OptInFastPeriod { get; set; }
     public int? OptInSlowPeriod { get; set; }
     public int? OptInSignalPeriod { get; set; }
+
+    public const int DefaultOptInFastPeriod = 12;
+    public const int DefaultOptInSlowPeriod = 26;
+    public const int DefaultOptInSignalPeriod = 9;
 
     #endregion
 
