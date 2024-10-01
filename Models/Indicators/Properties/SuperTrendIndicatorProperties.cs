@@ -22,6 +22,9 @@ public class SuperTrendIndicatorProperties : ISuperTrendIndicatorProperties {
     public int? Period { get; set; }
     public int? Multiplier { get; set; }
 
+    public const int DefaultPeriod = 7;
+    public const int DefaultMultiplier = 3;
+
     #endregion
 
 

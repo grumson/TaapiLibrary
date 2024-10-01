@@ -24,6 +24,11 @@ public class StochRsiIndicatorProperties : IStochRsiIndicatorProperties {
     public int? RsiPeriod { get; set; }
     public int? StochasticPeriod { get; set; }
 
+    public const int DefaultKPeriod = 5;
+    public const int DefaultDPeriod = 3;
+    public const int DefaultRsiPeriod = 14;
+    public const int DefaultStochasticPeriod = 14;
+
     #endregion
 
 

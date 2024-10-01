@@ -25,6 +25,10 @@ public class StochIndicatorProperties : IStochIndicatorProperties {
 
     public int? KSmooth { get; set; }
 
+    public const int DefaultKPeriod = 5;
+    public const int DefaultDPeriod = 3;
+    public const int DefaultKSmooth = 3;
+
     #endregion
 
 
