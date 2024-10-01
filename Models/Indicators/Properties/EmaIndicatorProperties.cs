@@ -7,7 +7,7 @@ using TaapiLibrary.Contracts.Requests.Interfaces.Indicators;
 using TaapiLibrary.Enums;
 
 namespace TaapiLibrary.Models.Indicators.Properties;
-public class EmaIndicatorPropertie : IEmaIndicatorProperties {
+public class EmaIndicatorProperties : IEmaIndicatorProperties {
 
 
     #region *** PROPERTIES ***
