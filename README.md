@@ -29,6 +29,7 @@ Supported indicators:
 - stochrsi
 - ma
 - dmi
+- candle
 
 ---
 
@@ -178,6 +179,14 @@ TaapiClient taapiClient = new TaapiClient();
 
 // Create BNBUSDT list of indicators properties and add properties for each indicator
 List<ITaapiIndicatorProperties> bnb_PropertiesList = new List<ITaapiIndicatorProperties>();
+// Candle propertie
+CandleIndicatorProperties candle_bnb = new CandleIndicatorProperties {
+    Id = "candle_bnb",
+    Chart = TaapiChart.Candles,
+    Backtrack = 10,
+    Results = "10",
+};
+bnb_PropertiesList.Add(candle_bnb);
 // Rsi propertie
 RsiIndicatorPropertie rsi_bnb = new RsiIndicatorPropertie { 
     Id = "rsi_bnb",
@@ -251,8 +260,13 @@ if(results?.Count > 0) {
         // Get symbol from Id
         string symbol = result.Id.Split("_")[1].ToUpper();
 
+        // CANDLE
+        if (result is ICandleIndicatorResults candleResult) {
+            DateTime dateTime = DateTimeOffset.FromUnixTimeSeconds((long)candleResult.Timestamp).DateTime;
+            Console.WriteLine($"Symbol: {symbol} {dateTime.ToString("dd.mm.yy HH:mm:ss")} - Open: {candleResult.Open} - Close: {candleResult.Close} - High: {candleResult.High} - Low: {candleResult.Low} - Volume: {candleResult.Volume}");
+        }
         // RSI
-        if (result is IRsiIndicatorResults rsiResult) {
+        else if (result is IRsiIndicatorResults rsiResult) {
             Console.WriteLine($"Symbol: {symbol} - RSI: {rsiResult.Value}");
         }
         // SuperTrend
@@ -284,13 +298,19 @@ Console.WriteLine("End of program");
 This section outlines the changes and improvements made in each version of the TaapiLibrary.
 
 
-## Version 1.0.5 - 2023-07-26
+## Version 1.0.6 - 2024-9-10
+
+### Added
+- candle indicator
+
+
+## Version 1.0.5 - 2024-07-26
 
 ### Added
 - defoult values for Indicator Properties
 
 
-## Version 1.0.4 - 2023-07-24
+## Version 1.0.4 - 2024-07-24
 
 ### Added
 - `Task<List<ITaapiIndicatorResults>> GetBulkIndicatorsResults(TaapiBulkRequest requests)`
@@ -301,7 +321,7 @@ This section outlines the changes and improvements made in each version of the T
 - `[Obsolete] Task<List<TaapiBulkResponse>> PostBulkIndicatorsAsync(TaapiBulkRequest requests)`
 
 
-## Version 1.0.3-alpha - 2023-07-18
+## Version 1.0.3-alpha - 2024-07-18
 
 ### Added
 - Posibility to set the `TaapiClient` base URL in the constructor.
@@ -314,7 +334,7 @@ This section outlines the changes and improvements made in each version of the T
 - Fixed an issue where `RateLimitExceededException` was not correctly handled in some scenarios.
 
 
-## Version 1.0.2 - 2023-07-16
+## Version 1.0.2 - 2024-07-16
 
 ### Added
 -
@@ -326,7 +346,7 @@ This section outlines the changes and improvements made in each version of the T
 - Some minor bug fixes and improvements.
 
 
-## Version 1.0.1 - 2023-07-15
+## Version 1.0.1 - 2024-07-15
 
 ### Added
 -
@@ -338,7 +358,7 @@ This section outlines the changes and improvements made in each version of the T
 - Some minor bug fixes and improvements.
 
 
-## Version 1.0.0 - 2023-07-15
+## Version 1.0.0 - 2024-07-15
 
 - Initial release of the TaapiLibrary.
 - Support for basic indicator retrieval and bulk indicator requests.

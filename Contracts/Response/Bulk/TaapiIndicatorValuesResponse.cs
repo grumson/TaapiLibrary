@@ -47,4 +47,14 @@ public class TaapiIndicatorValuesResponse
     public double? Mdi { get; set; }
 
 
+    // CANDLE
+    public double? volume { get; set; }
+    public string? timestampHuman { get; set; }
+    public int? timestamp { get; set; }
+    public double? open { get; set; }
+    public double? close { get; set; }
+    public double? high { get; set; }
+    public double? low { get; set; }
+
+
 }// class
