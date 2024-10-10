@@ -298,6 +298,12 @@ Console.WriteLine("End of program");
 This section outlines the changes and improvements made in each version of the TaapiLibrary.
 
 
+## Version 1.0.7 - 2024-10-10
+
+### Fixed
+- Costum indicator Id was not working properly
+
+
 ## Version 1.0.6 - 2024-9-10
 
 ### Added

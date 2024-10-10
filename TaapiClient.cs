@@ -523,6 +523,7 @@ public class TaapiClient {
             throw new NotImplementedException("The indicator is not implemented.");
         }
 
+        taapiIndicatorPropertiesRequest.Id = indicatorRequest.Id;
         taapiIndicatorPropertiesRequest.Backtrack = indicatorRequest.Backtrack;
         taapiIndicatorPropertiesRequest.Results = indicatorRequest.Results;
         taapiIndicatorPropertiesRequest.Gaps = indicatorRequest.ChartGaps;
