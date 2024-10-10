@@ -429,6 +429,7 @@ public class TaapiClient {
         if (indicatorRequest is IRsiIndicatorProperties rsiIndicatorProperties) {
 
             taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
+                
                 Period = rsiIndicatorProperties.Period,
             };
         }
@@ -511,12 +512,20 @@ public class TaapiClient {
                 Period = dmiIndicatorProperties.Period,
             };
         }
+        // CANDLE
+        else if (indicatorRequest is ICandleIndicatorProperties candleIndicatorProperties) {
+
+            taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) { };
+        }
         // Not implemented
         else {
 
             throw new NotImplementedException("The indicator is not implemented.");
         }
 
+        taapiIndicatorPropertiesRequest.Backtrack = indicatorRequest.Backtrack;
+        taapiIndicatorPropertiesRequest.Results = indicatorRequest.Results;
+        taapiIndicatorPropertiesRequest.Gaps = indicatorRequest.ChartGaps;
 
         return taapiIndicatorPropertiesRequest;
     }//end MapIndicatorRequest()
@@ -648,6 +657,22 @@ public class TaapiClient {
                 Adx = taapiBulkDataResponse.result.Adx,
                 Pdi = taapiBulkDataResponse.result.Pdi,
                 Mdi = taapiBulkDataResponse.result.Mdi,
+            };
+        }
+        // CANDLE
+        else if (taapiBulkDataResponse.indicator == TaapiIndicatorType.Candle.GetDescription()) {
+
+            taapiIndicatorResults = new CandleIndicatorResults {
+                Id = taapiBulkDataResponse.id,
+                Indicator = taapiBulkDataResponse.indicator,
+                Errors = taapiBulkDataResponse.errors,
+                Close = taapiBulkDataResponse.result.close,
+                High = taapiBulkDataResponse.result.high,
+                Low = taapiBulkDataResponse.result.low,
+                Open = taapiBulkDataResponse.result.open,
+                Timestamp = taapiBulkDataResponse.result.timestamp,
+                TimestampHuman = taapiBulkDataResponse.result.timestampHuman,
+                Volume = taapiBulkDataResponse.result.volume,
             };
         }
         // Not implemented

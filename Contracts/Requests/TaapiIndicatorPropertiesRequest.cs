@@ -23,6 +23,9 @@ public class TaapiIndicatorPropertiesRequest {
     [JsonProperty("gaps")]
     public bool? Gaps { get; set; }
 
+    [JsonProperty("results")]
+    public string? Results { get; set; }
+
 
     // RSI, SMA, EMA, BBands, SuperTrend, ATR, MA, DMI
     [JsonProperty("period")]
@@ -75,7 +78,7 @@ public class TaapiIndicatorPropertiesRequest {
 
     #region *** CONSTRUCTORS ***
     public TaapiIndicatorPropertiesRequest(TaapiIndicatorType indicator, TaapiChart chart, string? id = null, int? backtrack = null,
-        bool? gaps = null, int? period = null, int? stddev = null, int? multiplier = null, int? optInFastPeriod = null, int? optInSlowPeriod = null,
+        bool? gaps = null, string? results = null, int? period = null, int? stddev = null, int? multiplier = null, int? optInFastPeriod = null, int? optInSlowPeriod = null,
         int? optInSignalPeriod = null, int? kPeriod = null, int? dPeriod = null, int? kSmooth = null, int? rsiPeriod = null, int? stochasticPeriod = null) {
 
         Id = id;
@@ -83,6 +86,7 @@ public class TaapiIndicatorPropertiesRequest {
         Chart = chart.GetDescription();
         Backtrack = backtrack;
         Gaps = gaps;
+        Results = results;
         Period = period;
         StdDev = stddev;
         Multiplier = multiplier;
