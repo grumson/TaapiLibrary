@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Text;
 using TaapiLibrary.Contracts.Requests;
@@ -295,11 +296,10 @@ public class TaapiClient {
 
             // Chek if the response have errors
 
-
             // Deserialize the response
             TaapiBulkResponse? taapiBulkResponse = JsonConvert.DeserializeObject<TaapiBulkResponse>(jsonString);
 
-            // Get the indicators results from the response
+            //// Get the indicators results from the response
             List<ITaapiIndicatorResults> taapiIndicatorResultsList = GetIndicatorResults(taapiBulkResponse!);
 
             // Return the indicators results
@@ -517,6 +517,13 @@ public class TaapiClient {
 
             taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) { };
         }
+        // CANDLES
+        else if (indicatorRequest is ICandlesIndicatorProperties candlesIndicatorProperties) {
+
+            taapiIndicatorPropertiesRequest = new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) {
+                Period = candlesIndicatorProperties.Period,
+            };
+        }
         // Not implemented
         else {
 
@@ -525,6 +532,9 @@ public class TaapiClient {
 
         taapiIndicatorPropertiesRequest.Id = indicatorRequest.Id;
         taapiIndicatorPropertiesRequest.Backtrack = indicatorRequest.Backtrack;
+        taapiIndicatorPropertiesRequest.AddResultTimestamp = indicatorRequest.AddResultTimestamp;
+        taapiIndicatorPropertiesRequest.FromTimestamp = indicatorRequest.FromTimestamp;
+        taapiIndicatorPropertiesRequest.ToTimestamp = indicatorRequest.ToTimestamp;
         taapiIndicatorPropertiesRequest.Results = indicatorRequest.Results;
         taapiIndicatorPropertiesRequest.Gaps = indicatorRequest.ChartGaps;
 
@@ -676,6 +686,30 @@ public class TaapiClient {
                 Volume = taapiBulkDataResponse.result.volume,
             };
         }
+        // CANDLES
+        else if (taapiBulkDataResponse.indicator == TaapiIndicatorType.Candles.GetDescription()) {
+
+            taapiIndicatorResults = new CandlesIndicatorResults {
+                Id = taapiBulkDataResponse.id,
+                Indicator = taapiBulkDataResponse.indicator,
+                Errors = taapiBulkDataResponse.errors,
+                Candles = new List<CandleIndicatorResults>(),
+            };
+
+            if (taapiBulkDataResponse.result.veluesList?.Count > 0) {
+                foreach (var candle in taapiBulkDataResponse.result.veluesList) {
+                    CandleIndicatorResults candleIndicatorResults = new CandleIndicatorResults {
+                        Close = candle.close,
+                        High = candle.high,
+                        Low = candle.low,
+                        Open = candle.open,
+                        Timestamp = candle.timestamp,
+                        Volume = candle.volume,
+                    };
+                    ((CandlesIndicatorResults)taapiIndicatorResults).Candles.Add(candleIndicatorResults);
+                }
+            }
+        }
         // Not implemented
         else {
 
@@ -696,7 +730,51 @@ public class TaapiClient {
         List<ITaapiIndicatorResults> taapiIndicatorResultsList = new List<ITaapiIndicatorResults>();
 
         if (taapiBulkResponse?.data?.Count > 0) {
-            foreach (var taapiBulkDataResponse in taapiBulkResponse.data) {
+            foreach (var taapiBulkDataResponseRow in taapiBulkResponse.data) {
+
+                TaapiBulkDataResponse taapiBulkDataResponse = new TaapiBulkDataResponse {
+                    id = taapiBulkDataResponseRow.id,
+                    indicator = taapiBulkDataResponseRow.indicator,
+                    errors = taapiBulkDataResponseRow.errors,
+                };
+
+                if (taapiBulkDataResponseRow.result is JArray jArrayResult) {
+                    taapiBulkDataResponse.result = new TaapiIndicatorValuesResponse();
+                    taapiBulkDataResponse.result.veluesList = jArrayResult.ToObject<List<TaapiIndicatorValuesResponse>>();
+                }
+                else if (taapiBulkDataResponseRow.result is JObject jObjectResult) {
+                    taapiBulkDataResponse.result = jObjectResult.ToObject<TaapiIndicatorValuesResponse>();
+                }
+                else {
+                    // Handle other possible types or throw an exception
+                }
+
+
+                //if (taapiBulkDataResponseRow.result is JObject jObjectResult) {
+
+                //    taapiBulkDataResponse.result = jObjectResult.ToObject<TaapiIndicatorValuesResponse>();
+                //}
+                //else {
+
+                //    if (taapiBulkDataResponse.indicator == TaapiIndicatorType.Candles.GetDescription()) {
+
+                //        taapiBulkDataResponse.result = new TaapiIndicatorValuesResponse();
+                //        var list = (IArrayPool<TaapiIndicatorValuesResponse>)taapiBulkDataResponseRow.result;
+                //        //taapiBulkDataResponse.result.veluesList = list.ToList();
+
+                //        Console.WriteLine("Candles");
+
+                //    }
+
+                //}
+
+                //if (taapiBulkDataResponseRow.result is List<TaapiIndicatorValuesResponse> resultList) {
+                //    taapiBulkDataResponse.result = new TaapiIndicatorValuesResponse();
+                //    taapiBulkDataResponse.result.veluesList = resultList;
+                //}
+                //else if (taapiBulkDataResponseRow.result is TaapiIndicatorValuesResponse resultObject) {
+                //    taapiBulkDataResponse.result = resultObject;
+                //}
 
                 ITaapiIndicatorResults taapiIndicatorResults = MapIndicatorResults(taapiBulkDataResponse);
 

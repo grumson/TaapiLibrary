@@ -17,8 +17,11 @@ public class CandleIndicatorProperties : ICandleIndicatorProperties {
     public TaapiChart Chart { get; set; }
     public int? Backtrack { get; set; }
     public bool? ChartGaps { get; set; }
+    public bool? AddResultTimestamp { get; set; }
+    public string? FromTimestamp { get; set; }
+    public string? ToTimestamp { get; set; }
     public string? Results { get; set; }
-
+    
     #endregion
 
 

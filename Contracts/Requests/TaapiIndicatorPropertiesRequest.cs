@@ -26,6 +26,9 @@ public class TaapiIndicatorPropertiesRequest {
     [JsonProperty("results")]
     public string? Results { get; set; }
 
+    [JsonProperty("addResultTimestamp")]
+    public bool? AddResultTimestamp { get; set; }
+
 
     // RSI, SMA, EMA, BBands, SuperTrend, ATR, MA, DMI
     [JsonProperty("period")]
@@ -72,6 +75,14 @@ public class TaapiIndicatorPropertiesRequest {
 
     [JsonProperty("StochasticPeriod")]
     public int? StochasticPeriod { get; set; }
+
+
+    // Candles
+    [JsonProperty("fromTimestamp")]
+    public string? FromTimestamp { get; set; }
+
+    [JsonProperty("toTimestamp")]
+    public string? ToTimestamp { get; set; }
 
     #endregion
 

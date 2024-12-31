@@ -9,7 +9,7 @@ public class TaapiBulkResponse
 {
 
 
-    public List<TaapiBulkDataResponse> data { get; set; } = null!;
+    public List<TaapiBulkDataResponseRow> data { get; set; } = null!;
 
 
 }// class

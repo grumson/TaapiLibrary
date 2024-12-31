@@ -18,7 +18,7 @@ Suported exchanges:
 - GateIo
 
 Supported indicators:
-- RSI
+- rsi
 - macd
 - sma
 - ema
@@ -30,6 +30,7 @@ Supported indicators:
 - ma
 - dmi
 - candle
+- candles
 
 ---
 
@@ -184,11 +185,20 @@ CandleIndicatorProperties candle_bnb = new CandleIndicatorProperties {
     Id = "candle_bnb",
     Chart = TaapiChart.Candles,
     Backtrack = 10,
-    Results = "10",
 };
 bnb_PropertiesList.Add(candle_bnb);
+
+// Candles propertie
+CandlesIndicatorProperties candles_bnb = new CandlesIndicatorProperties {
+    Id = "candles_bnb",
+    Chart = TaapiChart.Candles,
+    Backtrack = 0,
+    Period = 10,
+};
+bnb_PropertiesList.Add(candles_bnb);
+
 // Rsi propertie
-RsiIndicatorPropertie rsi_bnb = new RsiIndicatorPropertie { 
+RsiIndicatorProperties rsi_bnb = new RsiIndicatorProperties {
     Id = "rsi_bnb",
     Chart = TaapiChart.Candles,
     Backtrack = 0,
@@ -225,7 +235,7 @@ var bnb_Construct = taapiClient.CreateBulkConstruct(TaapiExchange.BinanceFutures
 // Create BTCUSDT list of indicators properties and add properties for each indicator
 List<ITaapiIndicatorProperties> btc_PropertiesList = new List<ITaapiIndicatorProperties>();
 // MACD propertie
-MacdIndicatorPropertie macd_bnb = new MacdIndicatorPropertie {
+MacdIndicatorProperties macd_bnb = new MacdIndicatorProperties {
     Id = "macd_bnb",
     Chart = TaapiChart.Heikinashi,
     Backtrack = 0,
@@ -254,7 +264,7 @@ var results = await taapiClient.GetBulkIndicatorsResults(bulk);
 
 
 // Print results
-if(results?.Count > 0) {
+if (results?.Count > 0) {
     foreach (var result in results) {
 
         // Get symbol from Id
@@ -263,7 +273,14 @@ if(results?.Count > 0) {
         // CANDLE
         if (result is ICandleIndicatorResults candleResult) {
             DateTime dateTime = DateTimeOffset.FromUnixTimeSeconds((long)candleResult.Timestamp).DateTime;
-            Console.WriteLine($"Symbol: {symbol} {dateTime.ToString("dd.mm.yy HH:mm:ss")} - Open: {candleResult.Open} - Close: {candleResult.Close} - High: {candleResult.High} - Low: {candleResult.Low} - Volume: {candleResult.Volume}");
+            Console.WriteLine($"Symbol: {symbol} {dateTime.ToString("dd.MM.yy HH:mm:ss")} - Open: {candleResult.Open} - Close: {candleResult.Close} - High: {candleResult.High} - Low: {candleResult.Low} - Volume: {candleResult.Volume}");
+        }
+        // CANDLES
+        else if (result is ICandlesIndicatorResults candlesResult) {
+            foreach (var candle in candlesResult.Candles) {
+                DateTime dateTime = DateTimeOffset.FromUnixTimeSeconds((long)candle.Timestamp).DateTime;
+                Console.WriteLine($"Symbol: {symbol} {dateTime.ToString("dd.MM.yy HH:mm:ss")} - Open: {candle.Open} - Close: {candle.Close} - High: {candle.High} - Low: {candle.Low} - Volume: {candle.Volume}");
+            }
         }
         // RSI
         else if (result is IRsiIndicatorResults rsiResult) {
@@ -292,10 +309,33 @@ Console.WriteLine("End of program");
 ```
 
 
+## Suport this project
+
+### Networks BSC BNB smart chain (BEP20) : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
+BNB : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
+USDT : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
+
+### Networks Solana (SPL) : 4D1W3Vv2tbfAzuEgBSiNGqdtGT5wUjbodoF6mXEsnvTf
+SOL : 4D1W3Vv2tbfAzuEgBSiNGqdtGT5wUjbodoF6mXEsnvTf
+USDC : 4D1W3Vv2tbfAzuEgBSiNGqdtGT5wUjbodoF6mXEsnvTf
+
+### Networks Ethereum (ERC20) : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
+ETH : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
+USDC : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
+
+### BTC : 19pxXzh1Kzzw73v6iKbowr1DJro5ozgZj6
+
+
 
 # Changelog
 
 This section outlines the changes and improvements made in each version of the TaapiLibrary.
+
+
+## Version 1.0.8 - 2024-12-31
+
+### Added
+- candles indicator
 
 
 ## Version 1.0.7 - 2024-10-10

@@ -53,6 +53,10 @@ public enum TaapiIndicatorType {
     [Description("candle")]
     Candle,
 
+    [JsonProperty("candles")]
+    [Description("candles")]
+    Candles,
+
 
 }// enum
 

@@ -56,5 +56,7 @@ public class TaapiIndicatorValuesResponse
     public double? high { get; set; }
     public double? low { get; set; }
 
+    // List of values
+    public List<TaapiIndicatorValuesResponse>? veluesList { get; set; }
 
 }// class
