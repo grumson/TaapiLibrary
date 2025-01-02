@@ -471,6 +471,7 @@ public class TaapiClient {
             IDmiIndicatorProperties dmi => new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) { Period = dmi.Period },
             ICandleIndicatorProperties candle => new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart),
             ICandlesIndicatorProperties candles => new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) { Period = candles.Period },
+            IFibonacciRetracementIndicatorProperties fibonacciRetracement => new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) { Period = fibonacciRetracement.Period, Retracement = fibonacciRetracement.Retracement, Trend = fibonacciRetracement.Trend },
             _ => throw new NotImplementedException("The indicator is not implemented.")
         };
 
@@ -626,6 +627,7 @@ public class TaapiClient {
             var indicator when indicator == TaapiIndicatorType.Dmi.GetDescription() => new DmiIndicatorResults { Id = taapiBulkDataResponse.id, Indicator = taapiBulkDataResponse.indicator, Errors = taapiBulkDataResponse.errors, Adx = taapiBulkDataResponse.result.Adx, Pdi = taapiBulkDataResponse.result.Pdi, Mdi = taapiBulkDataResponse.result.Mdi },
             var indicator when indicator == TaapiIndicatorType.Candle.GetDescription() => new CandleIndicatorResults { Id = taapiBulkDataResponse.id, Indicator = taapiBulkDataResponse.indicator, Errors = taapiBulkDataResponse.errors, Close = taapiBulkDataResponse.result.close, High = taapiBulkDataResponse.result.high, Low = taapiBulkDataResponse.result.low, Open = taapiBulkDataResponse.result.open, Timestamp = taapiBulkDataResponse.result.timestamp, TimestampHuman = taapiBulkDataResponse.result.timestampHuman, Volume = taapiBulkDataResponse.result.volume },
             var indicator when indicator == TaapiIndicatorType.Candles.GetDescription() => new CandlesIndicatorResults { Id = taapiBulkDataResponse.id, Indicator = taapiBulkDataResponse.indicator, Errors = taapiBulkDataResponse.errors, Candles = taapiBulkDataResponse.result.veluesList?.Select(candle => new CandleIndicatorResults { Close = candle.close, High = candle.high, Low = candle.low, Open = candle.open, Timestamp = candle.timestamp, Volume = candle.volume }).ToList() ?? new List<CandleIndicatorResults>() },
+            var indicator when indicator == TaapiIndicatorType.FibonacciRetracement.GetDescription() => new FibonacciRetracementIndicatorResults { Id = taapiBulkDataResponse.id, Indicator = taapiBulkDataResponse.indicator, Errors = taapiBulkDataResponse.errors, Value = taapiBulkDataResponse.result.value, Trend = taapiBulkDataResponse.result.trend, EndPrice = taapiBulkDataResponse.result.endPrice, StartPrice = taapiBulkDataResponse.result.startPrice, EndTimestamp = taapiBulkDataResponse.result.endTimestamp, StartTimestamp = taapiBulkDataResponse.result.startTimestamp },
             _ => throw new NotImplementedException("The indicator is not implemented.")
         };
 

@@ -84,6 +84,14 @@ public class TaapiIndicatorPropertiesRequest {
     [JsonProperty("toTimestamp")]
     public string? ToTimestamp { get; set; }
 
+
+    // Fibonacci Retracement
+    [JsonProperty("retracement")]
+    public float? Retracement { get; set; }
+
+    [JsonProperty("trend")]
+    public string? Trend { get; set; }
+
     #endregion
 
 

@@ -19,11 +19,11 @@ Client library for interacting with the Taapi.io API in C#. It allows you to fet
 
 The `TaapiClient` class is designed to interact with the Taapi.io API for fetching various indicator values, posting bulk indicator requests, and managing API rate limits. It provides asynchronous methods for making API requests and includes error handling for common HTTP and API errors.
 
-Suported exchanges:
+#### Suported exchanges
 - Binance, Binance Futures, BinanceUs, Coinbase, Kraken, Bitstamp, WhiteBIT, ByBit, GateIo
 
-Supported indicators:
-- rsi, macd, sma, ema, stochastic, bbands, supertrend, atr, stochrsi, ma, dmi, candle, candles
+#### Supported indicators
+- rsi, macd, sma, ema, stochastic, bbands, supertrend, atr, stochrsi, ma, dmi, candle, candles, fibonacci retracement
 
 ---
 
@@ -32,7 +32,7 @@ Supported indicators:
 - Fetch individual indicator values asynchronously.
 - Post bulk indicators asynchronously.
 - Create bulk requests and constructs for multiple indicators.
-- Handle various exceptions such as unauthorized access, rate limit exceeded, and more.    | `60`                         |
+- Handle various exceptions such as unauthorized access, rate limit exceeded, and more.
 
 ---
 
@@ -70,7 +70,7 @@ Fetches indicator values asynchronously.
   - `RateLimitExceededException`: If the rate limit is exceeded.
   - Other exceptions for HTTP request errors.
 
-
+  ---
 
 #### `[Obsolete] Task<List<TaapiBulkResponse>> PostBulkIndicatorsAsync(TaapiBulkRequest requests)`
 
@@ -85,6 +85,7 @@ Fetches indicator values asynchronously.
 - **Exceptions**:  
   Same as `GetIndicatorAsync`.
 
+---
 
 #### `Task<List<ITaapiIndicatorResults>> GetBulkIndicatorsResults(TaapiBulkRequest requests)`
 
@@ -99,7 +100,7 @@ Fetches multiple indicator results asynchronously in bulk.
 - **Exceptions**:  
   Same as `GetIndicatorAsync`.
 
-
+  ---
 
 #### `TaapiBulkRequest CreateBulkRequest(string apiKey, List<TaapiBulkConstruct> bulkConstructList)`
 
@@ -115,7 +116,7 @@ Creates a bulk request for fetching multiple indicators.
 - **Exceptions**:
   - `ArgumentException`: If parameters are null or empty.
 
-
+  ---
 
 #### `TaapiBulkConstruct CreateBulkConstruct(TaapiExchange exchange, string symbol, TaapiCandlesInterval candlesInterval, List<ITaapiIndicatorProperties> indicatorList)`
 
@@ -135,17 +136,6 @@ Creates a bulk construct for a specific exchange, symbol, and interval, and incl
 
 ---
 
-### Exceptions
-
-- **`UnauthorizedAccessException`**: Thrown if the API key is invalid or unauthorized.
-- **`RateLimitExceededException`**: Thrown when the API's rate limit is exceeded.
-- **`ArgumentException`**: Thrown if invalid or missing parameters are provided.
-- **`HttpRequestException`**: Thrown when there is an error in the HTTP request.
-- **`JsonException`**: Thrown when JSON serialization/deserialization fails.
-- **`UriFormatException`**: Thrown if the URI format is invalid.
-
----
-
 ### Usage
 
 Here is an example of how to use the `TaapiClient` class to retrieve indicator values in console application:
@@ -153,11 +143,11 @@ Make sure to replace `"YOUR_API_KEY"` with your actual Taapi API key.
 
 ```csharp
 
-using TaapiLibrary;
 using TaapiLibrary.Contracts.Requests;
+using TaapiLibrary.Enums;
+using TaapiLibrary;
 using TaapiLibrary.Contracts.Requests.Interfaces;
 using TaapiLibrary.Contracts.Response.Bulk.Interfaces.Indicators;
-using TaapiLibrary.Enums;
 using TaapiLibrary.Models.Indicators.Properties;
 
 
@@ -171,6 +161,7 @@ TaapiClient taapiClient = new TaapiClient();
 
 // Create BNBUSDT list of indicators properties and add properties for each indicator
 List<ITaapiIndicatorProperties> bnb_PropertiesList = new List<ITaapiIndicatorProperties>();
+
 // Candle propertie
 CandleIndicatorProperties candle_bnb = new CandleIndicatorProperties {
     Id = "candle_bnb",
@@ -196,6 +187,7 @@ RsiIndicatorProperties rsi_bnb = new RsiIndicatorProperties {
     Period = 10,
 };
 bnb_PropertiesList.Add(rsi_bnb);
+
 // SuperTrend propertie
 SuperTrendIndicatorProperties superTrend_bnb = new SuperTrendIndicatorProperties {
     Id = "supertrend_bnb",
@@ -205,6 +197,7 @@ SuperTrendIndicatorProperties superTrend_bnb = new SuperTrendIndicatorProperties
     Multiplier = 3,
 };
 bnb_PropertiesList.Add(superTrend_bnb);
+
 // Stoch rsi propertie
 StochRsiIndicatorProperties stochRsi_bnb = new StochRsiIndicatorProperties {
     Id = "stochrsi_bnb",
@@ -225,9 +218,22 @@ var bnb_Construct = taapiClient.CreateBulkConstruct(TaapiExchange.BinanceFutures
 
 // Create BTCUSDT list of indicators properties and add properties for each indicator
 List<ITaapiIndicatorProperties> btc_PropertiesList = new List<ITaapiIndicatorProperties>();
+
+// Fibonacci retracement propertie
+FibonacciRetracementIndicatorProperties fibonacci_btc = new FibonacciRetracementIndicatorProperties {
+    Id = "fibonacciretracement_btc",
+    Chart = TaapiChart.Candles,
+    Backtrack = 1,
+    Retracement = 0.618f,
+    //FromTimestamp = "1767229200000", // From 2.01.2025 10:00:00
+    //ToTimestamp = "1767229200000", // To 2.01.2025 13:00:00
+    Period = 50,
+};
+btc_PropertiesList.Add(fibonacci_btc);
+
 // MACD propertie
 MacdIndicatorProperties macd_bnb = new MacdIndicatorProperties {
-    Id = "macd_bnb",
+    Id = "macd_btc",
     Chart = TaapiChart.Heikinashi,
     Backtrack = 0,
     OptInFastPeriod = 10,
@@ -237,7 +243,7 @@ MacdIndicatorProperties macd_bnb = new MacdIndicatorProperties {
 btc_PropertiesList.Add(macd_bnb);
 
 // Create Binance Futures BTCUSDT 5 min candle interval Bulk Construct from indicators properties ( MACD,... )
-var btc_Construct = taapiClient.CreateBulkConstruct(TaapiExchange.BinanceFutures, "BTC/USDT", TaapiCandlesInterval.FiveMinutes, btc_PropertiesList);
+var btc_Construct = taapiClient.CreateBulkConstruct(TaapiExchange.BinanceFutures, "BTC/USDT", TaapiCandlesInterval.OneHour, btc_PropertiesList);
 
 
 
@@ -290,6 +296,23 @@ if (results?.Count > 0) {
         else if (result is IMacdIndicatorResults macdResult) {
             Console.WriteLine($"Symbol: {symbol} - MACD: {macdResult.ValueMACD} - Hist:{macdResult.ValueMACDHist} - Signal:{macdResult.ValueMACDSignal}");
         }
+        // Fibonacci Retracement
+        else if (result is IFibonacciRetracementIndicatorResults fibonacciResult) {
+
+            string startTimestampString = fibonacciResult.StartTimestamp;
+            long startTimestamp = long.Parse(startTimestampString);
+            // Convert milliseconds to seconds
+            long startTimestampSeconds = startTimestamp / 1000;
+            DateTime startDate = DateTimeOffset.FromUnixTimeSeconds(startTimestampSeconds).DateTime;
+
+            string endTimestampString = fibonacciResult.EndTimestamp;
+            long endTimestamp = long.Parse(endTimestampString);
+            // Convert milliseconds to seconds
+            long endTimestampSeconds = endTimestamp / 1000;
+            DateTime endDate = DateTimeOffset.FromUnixTimeSeconds(endTimestampSeconds).DateTime;
+            Console.WriteLine($"Symbol: {symbol} - FibRet: {fibonacciResult.Value} - TREND: {fibonacciResult.Trend} - StartPrice: {fibonacciResult.StartPrice} - EndPrice: {fibonacciResult.EndPrice} " +
+                $"- StartDate: {startDate.ToString("dd.MM.yy HH:mm")} - EndDate: {endDate.ToString("dd.MM.yy HH:mm")}");
+        }
 
 
     }// foreach
@@ -303,15 +326,15 @@ Console.WriteLine("End of program");
 ### Suport this project
 If you like this project and you want to support it, you can donate to the following addresses:
 
-**Networks BSC BNB smart chain (BEP20)** : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
+**Network BSC BNB smart chain (BEP20)** : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
 - BNB : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
 - USDT : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
 
-**Networks Solana (SPL)** : 4D1W3Vv2tbfAzuEgBSiNGqdtGT5wUjbodoF6mXEsnvTf
+**Network Solana (SPL)** : 4D1W3Vv2tbfAzuEgBSiNGqdtGT5wUjbodoF6mXEsnvTf
 - SOL : 4D1W3Vv2tbfAzuEgBSiNGqdtGT5wUjbodoF6mXEsnvTf
 - USDC : 4D1W3Vv2tbfAzuEgBSiNGqdtGT5wUjbodoF6mXEsnvTf
 
-**Networks Ethereum (ERC20)** : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
+**Network Ethereum (ERC20)** : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
 - ETH : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
 - USDC : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
 
@@ -325,61 +348,72 @@ If you like this project and you want to support it, you can donate to the follo
 This section outlines the changes and improvements made in each version of the TaapiLibrary.
 
 
-#### Version 1.0.9 - 2025-01-05
-**Fixed**
-- Some minor bug fixes and improvements.
+#### Version 1.0.9 - 2025-01-02
+##### Added
+- fibonacci retracement indicator
+
+##### Improved
+- Some minor improvements.
+
+##### Fixed
+- Some minor bug fixes.
 
 
 #### Version 1.0.8 - 2024-12-31
-**Added**
+##### Added
 - candles indicator
 
 
 #### Version 1.0.7 - 2024-10-10
-**Fixed**
+##### Fixed
 - Costum indicator Id was not working properly
 
 
 #### Version 1.0.6 - 2024-9-10
-**Added**
+##### Added
 - candle indicator
 
 
 #### Version 1.0.5 - 2024-07-26
-**Added**
+##### Added
 - defoult values for Indicator Properties
 
 
 #### Version 1.0.4 - 2024-07-24
-**Added**
+##### Added
 - `Task<List<ITaapiIndicatorResults>> GetBulkIndicatorsResults(TaapiBulkRequest requests)`
 - `TaapiBulkConstruct CreateBulkConstruct(TaapiExchange exchange, string symbol, TaapiCandlesInterval candlesInterval, List<ITaapiIndicatorProperties> indicatorList)`
 - `TaapiBulkRequest CreateBulkRequest(string apiKey, List<TaapiBulkConstruct> bulkConstructList)`
-**Deprecated**
+
+##### Deprecated
 - `[Obsolete] Task<List<TaapiBulkResponse>> PostBulkIndicatorsAsync(TaapiBulkRequest requests)`
 
 
 #### Version 1.0.3-alpha - 2024-07-18
-**Added**
+##### Added
 - Posibility to set the `TaapiClient` base URL in the constructor.
 - Support for additional exchanges in `TaapiExchange.cs`.
-**Improved**
+
+##### Improved
 - Performance optimizations in the `TaapiClient` class for faster API responses.
-**Fixed**
+
+##### Fixed
 - Fixed an issue where `RateLimitExceededException` was not correctly handled in some scenarios.
 
 
 #### Version 1.0.2 - 2024-07-16
-**Improved**
+##### Improved
 - Some minor improvements.
-**Fixed**
+
+##### Fixed
 - Some minor bug fixes and improvements.
 
 
 #### Version 1.0.1 - 2024-07-15
-**Improved**
+##### Improved
 - Some minor improvements.
-**Fixed**
+
+##### Fixed
 - Some minor bug fixes and improvements.
 
 

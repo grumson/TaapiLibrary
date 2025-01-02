@@ -56,6 +56,15 @@ public class TaapiIndicatorValuesResponse
     public double? high { get; set; }
     public double? low { get; set; }
 
+
+    // FIBONACCI RETRACEMENT
+    public string? trend { get; set; }
+    public double? startPrice { get; set; }
+    public double? endPrice { get; set; }
+    public string? startTimestamp { get; set; }
+    public string? endTimestamp { get; set; }
+
+
     // List of values
     public List<TaapiIndicatorValuesResponse>? veluesList { get; set; }
 
