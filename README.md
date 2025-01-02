@@ -1,52 +1,44 @@
 
 
 # TaapiClient
+Client library for interacting with the Taapi.io API in C#. It allows you to fetch various technical indicators for financial markets.
+
+
+## Table of Contents
+- [Overview](#Overview)
+- [Features](#Features)
+- [Constructor](#Constructor)
+- [Methods](#Methods)
+- [Exceptions](#Exceptions)
+- [Usage](#Usage)
+- [Suport](#Suport)
+- [Changelog](#Changelog)
+
 
 ## Overview
 
 The `TaapiClient` class is designed to interact with the Taapi.io API for fetching various indicator values, posting bulk indicator requests, and managing API rate limits. It provides asynchronous methods for making API requests and includes error handling for common HTTP and API errors.
 
 Suported exchanges:
-- Binance
-- Binance Futures
-- BinanceUs
-- Coinbase
-- Kraken
-- Bitstamp
-- WhiteBIT
-- ByBit
-- GateIo
+- Binance, Binance Futures, BinanceUs, Coinbase, Kraken, Bitstamp, WhiteBIT, ByBit, GateIo
 
 Supported indicators:
-- rsi
-- macd
-- sma
-- ema
-- stochastic
-- bbands
-- supertrend
-- atr
-- stochrsi
-- ma
-- dmi
-- candle
-- candles
+- rsi, macd, sma, ema, stochastic, bbands, supertrend, atr, stochrsi, ma, dmi, candle, candles
 
 ---
 
-## Properties
+### Features
 
-| Name                 | Type         | Description                                                                                  | Default                      |
-|----------------------|--------------|----------------------------------------------------------------------------------------------|------------------------------|
-| `_httpClient`         | `HttpClient` | A static instance used for making HTTP requests to the Taapi API.                             | N/A                          |
-| `_baseUrl`            | `string`     | The base URL of the Taapi API.                                                                | `"https://api.taapi.io"`      |
-| `_retryAfterSeconds`  | `int`        | The number of seconds to wait before retrying a request after a rate limit is exceeded.       | `60`                         |
+- Fetch individual indicator values asynchronously.
+- Post bulk indicators asynchronously.
+- Create bulk requests and constructs for multiple indicators.
+- Handle various exceptions such as unauthorized access, rate limit exceeded, and more.    | `60`                         |
 
 ---
 
-## Constructors
+### Constructor
 
-### `TaapiClient(string baseUrl = "https://api.taapi.io", int retryAfterSeconds = 60)`
+#### `TaapiClient(string baseUrl = "https://api.taapi.io", int retryAfterSeconds = 60)`
 
 Initializes a new instance of the `TaapiClient` class.
 
@@ -56,9 +48,9 @@ Initializes a new instance of the `TaapiClient` class.
 
 ---
 
-## Methods
+### Methods
 
-### `Task<TaapiIndicatorValuesResponse> GetIndicatorAsync(string apiKey, string symbol, TaapiExchange exchange, TaapiCandlesInterval candlesInterval, TaapiIndicatorPropertiesRequest directParametersRequest)`
+#### `Task<TaapiIndicatorValuesResponse> GetIndicatorAsync(string apiKey, string symbol, TaapiExchange exchange, TaapiCandlesInterval candlesInterval, TaapiIndicatorPropertiesRequest directParametersRequest)`
 
 Fetches indicator values asynchronously.
 
@@ -78,9 +70,9 @@ Fetches indicator values asynchronously.
   - `RateLimitExceededException`: If the rate limit is exceeded.
   - Other exceptions for HTTP request errors.
 
----
 
-### `[Obsolete] Task<List<TaapiBulkResponse>> PostBulkIndicatorsAsync(TaapiBulkRequest requests)`
+
+#### `[Obsolete] Task<List<TaapiBulkResponse>> PostBulkIndicatorsAsync(TaapiBulkRequest requests)`
 
 **Deprecated.** Posts multiple indicator requests in bulk. Use `GetBulkIndicatorsResults` instead.
 
@@ -93,9 +85,8 @@ Fetches indicator values asynchronously.
 - **Exceptions**:  
   Same as `GetIndicatorAsync`.
 
----
 
-### `Task<List<ITaapiIndicatorResults>> GetBulkIndicatorsResults(TaapiBulkRequest requests)`
+#### `Task<List<ITaapiIndicatorResults>> GetBulkIndicatorsResults(TaapiBulkRequest requests)`
 
 Fetches multiple indicator results asynchronously in bulk.
 
@@ -108,9 +99,9 @@ Fetches multiple indicator results asynchronously in bulk.
 - **Exceptions**:  
   Same as `GetIndicatorAsync`.
 
----
 
-### `TaapiBulkRequest CreateBulkRequest(string apiKey, List<TaapiBulkConstruct> bulkConstructList)`
+
+#### `TaapiBulkRequest CreateBulkRequest(string apiKey, List<TaapiBulkConstruct> bulkConstructList)`
 
 Creates a bulk request for fetching multiple indicators.
 
@@ -124,9 +115,9 @@ Creates a bulk request for fetching multiple indicators.
 - **Exceptions**:
   - `ArgumentException`: If parameters are null or empty.
 
----
 
-### `TaapiBulkConstruct CreateBulkConstruct(TaapiExchange exchange, string symbol, TaapiCandlesInterval candlesInterval, List<ITaapiIndicatorProperties> indicatorList)`
+
+#### `TaapiBulkConstruct CreateBulkConstruct(TaapiExchange exchange, string symbol, TaapiCandlesInterval candlesInterval, List<ITaapiIndicatorProperties> indicatorList)`
 
 Creates a bulk construct for a specific exchange, symbol, and interval, and includes a list of indicators.
 
@@ -144,7 +135,7 @@ Creates a bulk construct for a specific exchange, symbol, and interval, and incl
 
 ---
 
-## Exceptions
+### Exceptions
 
 - **`UnauthorizedAccessException`**: Thrown if the API key is invalid or unauthorized.
 - **`RateLimitExceededException`**: Thrown when the API's rate limit is exceeded.
@@ -155,7 +146,7 @@ Creates a bulk construct for a specific exchange, symbol, and interval, and incl
 
 ---
 
-## Example Usage
+### Usage
 
 Here is an example of how to use the `TaapiClient` class to retrieve indicator values in console application:
 Make sure to replace `"YOUR_API_KEY"` with your actual Taapi API key.
@@ -307,9 +298,10 @@ if (results?.Count > 0) {
 Console.WriteLine("End of program");
 
 ```
-
+---
 
 ### Suport this project
+If you like this project and you want to support it, you can donate to the following addresses:
 
 **Networks BSC BNB smart chain (BEP20)** : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
 - BNB : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
@@ -328,85 +320,65 @@ Console.WriteLine("End of program");
 ---
 
 
-# Changelog
+### Changelog
 
 This section outlines the changes and improvements made in each version of the TaapiLibrary.
 
 
-## Version 1.0.8 - 2024-12-31
-
-### Added
+#### Version 1.0.8 - 2024-12-31
+**Added**
 - candles indicator
 
 
-## Version 1.0.7 - 2024-10-10
-
-### Fixed
+#### Version 1.0.7 - 2024-10-10
+**Fixed**
 - Costum indicator Id was not working properly
 
 
-## Version 1.0.6 - 2024-9-10
-
-### Added
+#### Version 1.0.6 - 2024-9-10
+**Added**
 - candle indicator
 
 
-## Version 1.0.5 - 2024-07-26
-
-### Added
+#### Version 1.0.5 - 2024-07-26
+**Added**
 - defoult values for Indicator Properties
 
 
-## Version 1.0.4 - 2024-07-24
-
-### Added
+#### Version 1.0.4 - 2024-07-24
+**Added**
 - `Task<List<ITaapiIndicatorResults>> GetBulkIndicatorsResults(TaapiBulkRequest requests)`
 - `TaapiBulkConstruct CreateBulkConstruct(TaapiExchange exchange, string symbol, TaapiCandlesInterval candlesInterval, List<ITaapiIndicatorProperties> indicatorList)`
 - `TaapiBulkRequest CreateBulkRequest(string apiKey, List<TaapiBulkConstruct> bulkConstructList)`
-
-### Deprecated
+**Deprecated**
 - `[Obsolete] Task<List<TaapiBulkResponse>> PostBulkIndicatorsAsync(TaapiBulkRequest requests)`
 
 
-## Version 1.0.3-alpha - 2024-07-18
-
-### Added
+#### Version 1.0.3-alpha - 2024-07-18
+**Added**
 - Posibility to set the `TaapiClient` base URL in the constructor.
 - Support for additional exchanges in `TaapiExchange.cs`.
-
-### Improved
+**Improved**
 - Performance optimizations in the `TaapiClient` class for faster API responses.
-
-### Fixed
+**Fixed**
 - Fixed an issue where `RateLimitExceededException` was not correctly handled in some scenarios.
 
 
-## Version 1.0.2 - 2024-07-16
-
-### Added
--
-
-### Improved
+#### Version 1.0.2 - 2024-07-16
+**Improved**
 - Some minor improvements.
-
-### Fixed
+**Fixed**
 - Some minor bug fixes and improvements.
 
 
-## Version 1.0.1 - 2024-07-15
-
-### Added
--
-
-### Improved
+#### Version 1.0.1 - 2024-07-15
+**Improved**
 - Some minor improvements.
-
-### Fixed
+**Fixed**
 - Some minor bug fixes and improvements.
 
 
-## Version 1.0.0 - 2024-07-15
-
+#### Version 1.0.0 - 2024-07-15
 - Initial release of the TaapiLibrary.
 - Support for basic indicator retrieval and bulk indicator requests.
 
