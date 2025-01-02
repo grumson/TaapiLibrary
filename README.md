@@ -325,6 +325,11 @@ If you like this project and you want to support it, you can donate to the follo
 This section outlines the changes and improvements made in each version of the TaapiLibrary.
 
 
+#### Version 1.0.9 - 2025-01-05
+**Fixed**
+- Some minor bug fixes and improvements.
+
+
 #### Version 1.0.8 - 2024-12-31
 **Added**
 - candles indicator
