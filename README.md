@@ -23,7 +23,7 @@ The `TaapiClient` class is designed to interact with the Taapi.io API for fetchi
 - Binance, Binance Futures, BinanceUs, Coinbase, Kraken, Bitstamp, WhiteBIT, ByBit, GateIo
 
 #### Supported indicators
-- rsi, macd, sma, ema, stochastic, bbands, supertrend, atr, stochrsi, ma, dmi, candle, candles, fibonacci retracement
+- rsi, macd, sma, ema, stochastic, bbands, supertrend, atr, stochrsi, ma, dmi, candle, candles, fibonacci retracement, standard deviation
 
 ---
 
@@ -161,6 +161,16 @@ TaapiClient taapiClient = new TaapiClient();
 
 // Create BNBUSDT list of indicators properties and add properties for each indicator
 List<ITaapiIndicatorProperties> bnb_PropertiesList = new List<ITaapiIndicatorProperties>();
+
+// Standard Deviation propertie
+StandardDeviationIndicatorProperties stddev_bnb = new StandardDeviationIndicatorProperties {
+    Id = "stddev_bnb",
+    Chart = TaapiChart.Candles,
+    Backtrack = 0,
+    Period = 10,
+    OptInNbDev = 2.0f,
+};
+bnb_PropertiesList.Add(stddev_bnb);
 
 // Candle propertie
 CandleIndicatorProperties candle_bnb = new CandleIndicatorProperties {
@@ -313,6 +323,10 @@ if (results?.Count > 0) {
             Console.WriteLine($"Symbol: {symbol} - FibRet: {fibonacciResult.Value} - TREND: {fibonacciResult.Trend} - StartPrice: {fibonacciResult.StartPrice} - EndPrice: {fibonacciResult.EndPrice} " +
                 $"- StartDate: {startDate.ToString("dd.MM.yy HH:mm")} - EndDate: {endDate.ToString("dd.MM.yy HH:mm")}");
         }
+        // Standard Deviation
+        else if (result is IStandardDeviationIndicatorResults stddevResult) {
+            Console.WriteLine($"Symbol: {symbol} - StdDev: {stddevResult.Value}");
+        }
 
 
     }// foreach
@@ -346,6 +360,11 @@ If you like this project and you want to support it, you can donate to the follo
 ### Changelog
 
 This section outlines the changes and improvements made in each version of the TaapiLibrary.
+
+
+#### Version 1.1.0 - 2025-01-03
+##### Added
+- standard deviation indicator
 
 
 #### Version 1.0.9 - 2025-01-02

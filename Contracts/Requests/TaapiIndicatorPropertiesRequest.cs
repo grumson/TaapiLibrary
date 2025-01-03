@@ -92,33 +92,21 @@ public class TaapiIndicatorPropertiesRequest {
     [JsonProperty("trend")]
     public string? Trend { get; set; }
 
+
+    // Stddev
+    [JsonProperty("optInNbDev")]
+    public float? OptInNbDev { get; set; }
+
     #endregion
 
 
     #region *** CONSTRUCTORS ***
-    public TaapiIndicatorPropertiesRequest(TaapiIndicatorType indicator, TaapiChart chart, string? id = null, int? backtrack = null,
-        bool? gaps = null, string? results = null, int? period = null, int? stddev = null, int? multiplier = null, int? optInFastPeriod = null, int? optInSlowPeriod = null,
-        int? optInSignalPeriod = null, int? kPeriod = null, int? dPeriod = null, int? kSmooth = null, int? rsiPeriod = null, int? stochasticPeriod = null) {
 
-        Id = id;
+    public TaapiIndicatorPropertiesRequest(TaapiIndicatorType indicator, TaapiChart chart) {
         Indicator = indicator.GetDescription();
         Chart = chart.GetDescription();
-        Backtrack = backtrack;
-        Gaps = gaps;
-        Results = results;
-        Period = period;
-        StdDev = stddev;
-        Multiplier = multiplier;
-        OptInFastPeriod = optInFastPeriod;
-        OptInSlowPeriod = optInSlowPeriod;
-        OptInSignalPeriod = optInSignalPeriod;
-        KPeriod = kPeriod;
-        DPeriod = dPeriod;
-        KSmooth = kSmooth;
-        RsiPeriod = rsiPeriod;
-        StochasticPeriod = stochasticPeriod;
-
     }
+
     #endregion
 
 

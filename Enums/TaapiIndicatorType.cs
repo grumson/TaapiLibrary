@@ -61,17 +61,19 @@ public enum TaapiIndicatorType {
     [Description("fibonacciretracement")]
     FibonacciRetracement,
 
-    //[JsonProperty("stddev")]
-    //[Description("stddev")]
-    //StdDev,
+    [JsonProperty("stddev")]
+    [Description("stddev")]
+    StandardDeviation,
+
+    //[JsonProperty("adx")]
+    //[Description("adx")]
+    //Adx,
 
     //[JsonProperty("wad")]
     //[Description("wad")]
     //AccumulationDistribution,
 
-    //[JsonProperty("adx")]
-    //[Description("adx")]
-    //Adx,
+
 
     //[JsonProperty("ichimoku")]
     //[Description("ichimoku")]
