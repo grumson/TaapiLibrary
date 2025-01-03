@@ -14,7 +14,7 @@ public class AtrIndicatorResults : IAtrIndicatorResults {
     public string Id { get; set; } = string.Empty;
     public string Indicator { get; set; } = string.Empty;
     public List<string> Errors { get; set; } = new List<string>();
-    public double? Value { get; set; }
+    public decimal? Value { get; set; }
 
     #endregion
 
