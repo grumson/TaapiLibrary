@@ -65,15 +65,13 @@ public enum TaapiIndicatorType {
     [Description("stddev")]
     StandardDeviation,
 
-    //[JsonProperty("adx")]
-    //[Description("adx")]
-    //Adx,
+    [JsonProperty("adx")]
+    [Description("adx")]
+    AverageDirectionalMovement,
 
     //[JsonProperty("wad")]
     //[Description("wad")]
-    //AccumulationDistribution,
-
-
+    //WilliamsAccumulationDistribution,
 
     //[JsonProperty("ichimoku")]
     //[Description("ichimoku")]

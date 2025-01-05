@@ -3,16 +3,17 @@
 # TaapiClient
 Client library for interacting with the Taapi.io API in C#. It allows you to fetch various technical indicators for financial markets.
 
+**If you have any questions, suggestions, or you want to contribute to this project, feel free to contact me at** <info@grumson.eu>
+
 
 ## Table of Contents
-- [Overview](#Overview)
-- [Features](#Features)
-- [Constructor](#Constructor)
-- [Methods](#Methods)
-- [Exceptions](#Exceptions)
-- [Usage](#Usage)
-- [Suport](#Suport)
-- [Changelog](#Changelog)
+- [Overview](#overview)
+- [Features](#features)
+- [Constructor](#constructor)
+- [Methods](#methods)
+- [Usage](#usage)
+- [Suport this project](#suport)
+- [Changelog](#changelog)
 
 
 ## Overview
@@ -23,7 +24,8 @@ The `TaapiClient` class is designed to interact with the Taapi.io API for fetchi
 - Binance, Binance Futures, BinanceUs, Coinbase, Kraken, Bitstamp, WhiteBIT, ByBit, GateIo
 
 #### Supported indicators
-- rsi, macd, sma, ema, stochastic, bbands, supertrend, atr, stochrsi, ma, dmi, candle, candles, fibonacci retracement, standard deviation
+- rsi, macd, sma, ema, stochastic, bbands, supertrend, atr, stochrsi, ma, dmi, candle, candles, fibonacci retracement, standard deviation, average directional movement
+
 
 ---
 
@@ -38,7 +40,7 @@ The `TaapiClient` class is designed to interact with the Taapi.io API for fetchi
 
 ### Constructor
 
-#### `TaapiClient(string baseUrl = "https://api.taapi.io", int retryAfterSeconds = 60)`
+#### `TaapiClient`(string baseUrl = "https://api.taapi.io", int retryAfterSeconds = 60)
 
 Initializes a new instance of the `TaapiClient` class.
 
@@ -50,7 +52,7 @@ Initializes a new instance of the `TaapiClient` class.
 
 ### Methods
 
-#### `Task<TaapiIndicatorValuesResponse> GetIndicatorAsync(string apiKey, string symbol, TaapiExchange exchange, TaapiCandlesInterval candlesInterval, TaapiIndicatorPropertiesRequest directParametersRequest)`
+#### GetIndicatorAsync
 
 Fetches indicator values asynchronously.
 
@@ -72,9 +74,10 @@ Fetches indicator values asynchronously.
 
   ---
 
-#### `[Obsolete] Task<List<TaapiBulkResponse>> PostBulkIndicatorsAsync(TaapiBulkRequest requests)`
+#### [Obsolete] PostBulkIndicatorsAsync
 
-**Deprecated.** Posts multiple indicator requests in bulk. Use `GetBulkIndicatorsResults` instead.
+**Deprecated.** Posts multiple indicator requests in bulk.
+GetIndicatorAsync is deprecated, please use the new method `GetBulkIndicatorsResults` instead.
 
 - **Parameters**:
   - `requests`: The request object containing multiple indicator requests.
@@ -87,7 +90,7 @@ Fetches indicator values asynchronously.
 
 ---
 
-#### `Task<List<ITaapiIndicatorResults>> GetBulkIndicatorsResults(TaapiBulkRequest requests)`
+#### GetBulkIndicatorsResults
 
 Fetches multiple indicator results asynchronously in bulk.
 
@@ -102,7 +105,7 @@ Fetches multiple indicator results asynchronously in bulk.
 
   ---
 
-#### `TaapiBulkRequest CreateBulkRequest(string apiKey, List<TaapiBulkConstruct> bulkConstructList)`
+#### CreateBulkRequest
 
 Creates a bulk request for fetching multiple indicators.
 
@@ -118,7 +121,7 @@ Creates a bulk request for fetching multiple indicators.
 
   ---
 
-#### `TaapiBulkConstruct CreateBulkConstruct(TaapiExchange exchange, string symbol, TaapiCandlesInterval candlesInterval, List<ITaapiIndicatorProperties> indicatorList)`
+#### CreateBulkConstruct
 
 Creates a bulk construct for a specific exchange, symbol, and interval, and includes a list of indicators.
 
@@ -337,7 +340,8 @@ Console.WriteLine("End of program");
 ```
 ---
 
-### Suport this project
+### Suport
+
 If you like this project and you want to support it, you can donate to the following addresses:
 
 **Network BSC BNB smart chain (BEP20)** : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
@@ -360,6 +364,10 @@ If you like this project and you want to support it, you can donate to the follo
 ### Changelog
 
 This section outlines the changes and improvements made in each version of the TaapiLibrary.
+
+#### Version 1.1.1 - 2025-01-05
+##### Added
+- average directional movement index indicator
 
 
 #### Version 1.1.0 - 2025-01-03

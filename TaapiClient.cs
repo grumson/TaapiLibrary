@@ -473,6 +473,7 @@ public class TaapiClient {
             ICandlesIndicatorProperties candles => new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) { Period = candles.Period },
             IFibonacciRetracementIndicatorProperties fibonacciRetracement => new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) { Period = fibonacciRetracement.Period, Retracement = fibonacciRetracement.Retracement, Trend = fibonacciRetracement.Trend },
             IStandardDeviationIndicatorProperties standardDeviation => new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) { Period = standardDeviation.Period, OptInNbDev = standardDeviation.OptInNbDev },
+            IAdxIndicatorProperties adx => new TaapiIndicatorPropertiesRequest(indicatorRequest.Indicator, indicatorRequest.Chart) { Period = adx.Period },
             _ => throw new NotImplementedException("The indicator is not implemented.")
         };
 
@@ -511,6 +512,7 @@ public class TaapiClient {
             var indicator when indicator == TaapiIndicatorType.Candles.GetDescription() => new CandlesIndicatorResults { Id = taapiBulkDataResponse.id, Indicator = taapiBulkDataResponse.indicator, Errors = taapiBulkDataResponse.errors, Candles = taapiBulkDataResponse.result.veluesList?.Select(candle => new CandleIndicatorResults { Close = candle.close, High = candle.high, Low = candle.low, Open = candle.open, Timestamp = candle.timestamp, Volume = candle.volume }).ToList() ?? new List<CandleIndicatorResults>() },
             var indicator when indicator == TaapiIndicatorType.FibonacciRetracement.GetDescription() => new FibonacciRetracementIndicatorResults { Id = taapiBulkDataResponse.id, Indicator = taapiBulkDataResponse.indicator, Errors = taapiBulkDataResponse.errors, Value = taapiBulkDataResponse.result.value, Trend = taapiBulkDataResponse.result.trend, EndPrice = taapiBulkDataResponse.result.endPrice, StartPrice = taapiBulkDataResponse.result.startPrice, EndTimestamp = taapiBulkDataResponse.result.endTimestamp, StartTimestamp = taapiBulkDataResponse.result.startTimestamp },
             var indicator when indicator == TaapiIndicatorType.StandardDeviation.GetDescription() => new StandardDeviationIndicatorResults { Id = taapiBulkDataResponse.id, Indicator = taapiBulkDataResponse.indicator, Errors = taapiBulkDataResponse.errors, Value = taapiBulkDataResponse.result.value },
+            var indicator when indicator == TaapiIndicatorType.AverageDirectionalMovement.GetDescription() => new AdxIndicatorResults { Id = taapiBulkDataResponse.id, Indicator = taapiBulkDataResponse.indicator, Errors = taapiBulkDataResponse.errors, Value = taapiBulkDataResponse.result.value },
             _ => throw new NotImplementedException("The indicator is not implemented.")
         };
     }//end MapIndicatorResults()
