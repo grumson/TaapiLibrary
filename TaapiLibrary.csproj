@@ -5,8 +5,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<PackageId>Grumson.Utilities.Taapi</PackageId>
-		<Version>1.1.1</Version>
-		<FileVersion>1.1.1</FileVersion>
+		<Version>2.0.0</Version>
+		<FileVersion>2.0.0</FileVersion>
 		<Authors>Dejan Grum</Authors>
 		<Company>Grumson</Company>
 		<Description>Taapi library</Description>
@@ -30,17 +30,6 @@
 	<ItemGroup>
 		<None Include="LICENSE.txt" Pack="true" PackagePath="" />
 		<None Include="README.md" Pack="true" PackagePath="" />
-		<None Include="BulkRequest.png" Pack="true" PackagePath="" />
-		<None Include="BulkResponse.png" Pack="true" PackagePath="" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="BulkRequest.png">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="BulkResponse.png">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
 	</ItemGroup>
 
 
