@@ -37,7 +37,16 @@ The Taapi class library is a .NET library designed to provide a simple, structur
 Add the library to your .NET project using one of the following methods:
 
 ```bash
-Install-Package Grumson.Taapi
+
+// .NET CLI
+> dotnet add package Grumson.Utilities.Taapi --version 2.0.0
+
+// Package Manager
+PM> NuGet\Install-Package Grumson.Utilities.Taapi -Version 2.0.0
+
+// Package Reference
+<PackageReference Include="Grumson.Utilities.Taapi" Version="2.0.0" />
+
 ```
 
 Or, include the project in your solution and reference it directly.
@@ -328,7 +337,7 @@ This project is licensed under the MIT License. See `LICENSE` for more informati
 
 ---
 
-## Suport
+## Support
 
 If you like this project and you want to support it, you can donate to the following addresses:
 
