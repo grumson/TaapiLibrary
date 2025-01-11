@@ -39,13 +39,13 @@ Add the library to your .NET project using one of the following methods:
 ```bash
 
 // .NET CLI
-> dotnet add package Grumson.Utilities.Taapi --version 2.0.0
+> dotnet add package Grumson.Utilities.Taapi --version 2.0.1
 
 // Package Manager
-PM> NuGet\Install-Package Grumson.Utilities.Taapi -Version 2.0.0
+PM> NuGet\Install-Package Grumson.Utilities.Taapi -Version 2.0.1
 
 // Package Reference
-<PackageReference Include="Grumson.Utilities.Taapi" Version="2.0.0" />
+<PackageReference Include="Grumson.Utilities.Taapi" Version="2.0.1" />
 
 ```
 
