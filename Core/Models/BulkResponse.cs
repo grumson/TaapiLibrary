@@ -23,6 +23,7 @@ public class BulkResponse {
     /// <param name="jsonResponse">The JSON string response from the API.</param>
     /// <returns>A BulkResponse object populated with parsed data.</returns>
     public static BulkResponse FromJson(string jsonResponse) {
+
         if (string.IsNullOrWhiteSpace(jsonResponse)) {
             throw new ArgumentException("Response cannot be null or empty", nameof(jsonResponse));
         }
@@ -31,7 +32,6 @@ public class BulkResponse {
             using var document = JsonDocument.Parse(jsonResponse);
             var root = document.RootElement;
 
-            // Preveri, ali obstaja polje "data"
             if (!root.TryGetProperty("data", out var dataElement) || dataElement.ValueKind != JsonValueKind.Array) {
                 throw new InvalidOperationException("Invalid JSON structure: Missing or invalid 'data' array.");
             }
@@ -39,17 +39,35 @@ public class BulkResponse {
             var bulkResponse = new BulkResponse();
 
             foreach (var indicatorElement in dataElement.EnumerateArray()) {
-                var bulkIndicator = new BulkIndicatorResponse {
-                    Id = indicatorElement.GetProperty("id").GetString() ?? string.Empty,
-                    Result = indicatorElement.GetProperty("result")
-                        .EnumerateObject()
-                        .ToDictionary(prop => prop.Name, prop => (object)prop.Value.ToString()),
-                    Errors = indicatorElement.TryGetProperty("errors", out var errorsElement) && errorsElement.ValueKind == JsonValueKind.Array
-                        ? errorsElement.EnumerateArray().Select(e => e.GetString() ?? string.Empty).ToList()
-                        : new List<string>()
-                };
+                var id = indicatorElement.GetProperty("id").GetString() ?? string.Empty;
+                var indicatorType = indicatorElement.GetProperty("indicator").GetString() ?? string.Empty;
 
-                bulkResponse.Data.Add(bulkIndicator);
+                object result;
+
+                var resultElement = indicatorElement.GetProperty("result");
+
+                // Handle 'candles' as an array
+                if (indicatorType.Equals("candles", StringComparison.OrdinalIgnoreCase) && resultElement.ValueKind == JsonValueKind.Array) {
+                    result = resultElement.Deserialize<List<CandleData>>() ?? new List<CandleData>();
+                }
+                // Handle other indicators as objects
+                else if (resultElement.ValueKind == JsonValueKind.Object) {
+                    result = resultElement.EnumerateObject()
+                        .ToDictionary(prop => prop.Name, prop => (object)prop.Value.ToString());
+                }
+                else {
+                    throw new InvalidOperationException($"Unexpected 'result' format for indicator {indicatorType}.");
+                }
+
+                var errors = indicatorElement.TryGetProperty("errors", out var errorsElement) && errorsElement.ValueKind == JsonValueKind.Array
+                    ? errorsElement.EnumerateArray().Select(e => e.GetString() ?? string.Empty).ToList()
+                    : new List<string>();
+
+                bulkResponse.Data.Add(new BulkIndicatorResponse {
+                    Id = id,
+                    Result = result,
+                    Errors = errors
+                });
             }
 
             return bulkResponse;
@@ -57,7 +75,8 @@ public class BulkResponse {
         catch (Exception ex) when (ex is JsonException or InvalidOperationException) {
             throw new InvalidOperationException("Failed to parse JSON response.", ex);
         }
-    }
+
+    }//end FromJson()
 
     // Notranji razred za deserializacijo odziva API-ja
     private class BulkResponseWrapper {
@@ -84,9 +103,9 @@ public class BulkIndicatorResponse {
     public string Id { get; set; } = string.Empty;
 
     /// <summary>
-    /// The result data of the indicator.
+    /// The result data of the indicator (can be a dictionary or a list of candles).
     /// </summary>
-    public Dictionary<string, object> Result { get; set; } = new();
+    public object Result { get; set; } = new();
 
     /// <summary>
     /// A list of any errors encountered while fetching this indicator.

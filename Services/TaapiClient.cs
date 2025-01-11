@@ -70,6 +70,7 @@ public class TaapiClient : ITaapiClient {
         }
 
         try {
+
             await _rateLimiter.WaitToProceedAsync();
 
             request.ApiKey = _apiKey;
@@ -85,7 +86,7 @@ public class TaapiClient : ITaapiClient {
             }
 
             _logger?.LogInformation("Successfully fetched indicator {Indicator} data for {Symbol}.", request.Indicator, request.Symbol);
-            return IndicatorResponse.FromJson(responseBody);
+            return IndicatorResponse.FromJson(responseBody, request.Indicator);
         }
         catch (Exception ex) {
             _logger?.LogError(ex, "Error fetching indicator {Indicator} data for {Symbol} on {Exchange}.", request.Indicator, request.Symbol, request.Exchange);

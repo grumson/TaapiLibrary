@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace TaapiLibrary.Core.Enums;
-public enum TaapiIndicatorType {
+public enum IndicatorType {
 
     [JsonProperty("rsi")]
     [Description("rsi")]

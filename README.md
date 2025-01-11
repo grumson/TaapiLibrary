@@ -69,7 +69,6 @@ var client = new TaapiClient(logger, apiKey, subscriptionType);
 ```
 
 ### Fetch a Single Indicator
-
 ```csharp
 try {
 
@@ -99,8 +98,52 @@ catch (TaapiException ex)
 }
 ```
 
-### Bulk Indicator Request
+### Fetch candles
+```csharp
+try {
 
+    // Build the indicator request
+    var request = new IndicatorRequest {
+        Exchange = "binance",
+        Symbol = "BTC/USDT",
+        Interval = "1h",
+        Indicator = "candles",
+        AdditionalParameters = new Dictionary<string, string> {
+            { "period", "10" } // Number of candles
+        }
+    };
+
+    var response = await client.GetIndicatorAsync(request);
+
+    Console.WriteLine("Candles Response:");
+    if(response.Candles?.Count > 0) {
+        foreach (var candle in response.Candles) {
+            Console.WriteLine($"Open: {candle.Open}");
+            Console.WriteLine($"High: {candle.High}");
+            Console.WriteLine($"Low: {candle.Low}");
+            Console.WriteLine($"Close: {candle.Close}");
+            Console.WriteLine($"Volume: {candle.Volume}");
+            Console.WriteLine($"Timestamp: {candle.TimestampHuman}");
+            Console.WriteLine();
+        }
+    }
+
+} 
+catch (RateLimitException ex)
+{
+    Console.WriteLine("Rate limit exceeded: " + ex.Message);
+}
+catch (AuthenticationException ex)
+{
+    Console.WriteLine("Authentication failed: " + ex.Message);
+}
+catch (TaapiException ex)
+{
+    Console.WriteLine("API error: " + ex.Message);
+}
+```
+
+### Bulk Indicator Request
 ```csharp
 try
 {
@@ -134,9 +177,24 @@ try
         // Print the symbol and indicator name
         Console.WriteLine($"Symbol: {symbol}, Indicator: {indicator}");
 
-        // Print the indicator results
-        foreach (var result in data.Result) {
-            Console.WriteLine($"{result.Key}: {result.Value}");
+        // Chek if the result is a dictionary or a list of candles
+        if (data.Result is Dictionary<string, object> resultDict) {
+            // Process standard indicators
+            foreach (var result in resultDict) {
+                Console.WriteLine($"{result.Key}: {result.Value}");
+            }
+        }
+        else if (data.Result is List<CandleData> candles) {
+            // Process candles data
+            foreach (var candle in candles) {
+                Console.WriteLine($"Open: {candle.Open}");
+                Console.WriteLine($"High: {candle.High}");
+                Console.WriteLine($"Low: {candle.Low}");
+                Console.WriteLine($"Close: {candle.Close}");
+                Console.WriteLine($"Volume: {candle.Volume}");
+                Console.WriteLine($"Timestamp: {candle.TimestampHuman}");
+                Console.WriteLine();
+            }
         }
 
         Console.WriteLine();
@@ -162,12 +220,12 @@ catch (TaapiException ex)
 ```
 
 ### Bulk indicators for multiple constructs
-
 ```csharp
 try
 {
 
-        var bulkRequest = new BulkRequest {
+    // Build bulk request for multiple constructs with multiple indicators
+    var bulkRequest = new BulkRequest {
         Constructs = new List<Construct>
         {
             new Construct
@@ -191,6 +249,16 @@ try
                     new IndicatorDetail { Id = "ETH_rsi_4h", Indicator = "rsi" },
                     new IndicatorDetail { Id = "ETH_macd_4h", Indicator = "macd" }
                 }
+            },
+            new Construct
+            {
+                Exchange = ExchangeType.Binance.GetDescription(),
+                Symbol = "BNB/USDT",
+                Interval = TimeFrame.FourHours.GetDescription(),
+                Indicators = new List<IndicatorDetail>
+                {
+                    new IndicatorDetail { Id = "BNB_candles_4h", Indicator = IndicatorType.Candles.GetDescription(), AdditionalParameters = new Dictionary<string, string> { { "period", "10" } } }
+                }
             }
         }
     };
@@ -200,7 +268,7 @@ try
 
     foreach (var data in response.Data) {
 
-        // Split the indicator ID to get the symbol, indicator name and time frame
+        // Split the indicator ID to get the symbol and indicator name
         string[] idParts = data.Id.Split('_');
         string symbol = idParts[0];
         string indicator = idParts[1];
@@ -209,9 +277,24 @@ try
         // Print the symbol and indicator name
         Console.WriteLine($"Symbol: {symbol}, Indicator: {indicator}, Interval: {interval}");
 
-        // Print the indicator results
-        foreach (var result in data.Result) {
-            Console.WriteLine($"{result.Key}: {result.Value}");
+        // Chek if the result is a dictionary or a list of candles
+        if (data.Result is Dictionary<string, object> resultDict) {
+            // Print the indicator results
+            foreach (var result in resultDict) {
+                Console.WriteLine($"{result.Key}: {result.Value}");
+            }
+        }
+        else if (data.Result is List<CandleData> candles) {
+            // Process candles data
+            foreach (var candle in candles) {
+                Console.WriteLine($"Open: {candle.Open}");
+                Console.WriteLine($"High: {candle.High}");
+                Console.WriteLine($"Low: {candle.Low}");
+                Console.WriteLine($"Close: {candle.Close}");
+                Console.WriteLine($"Volume: {candle.Volume}");
+                Console.WriteLine($"Timestamp: {candle.TimestampHuman}");
+                Console.WriteLine();
+            }
         }
 
         Console.WriteLine();
@@ -241,7 +324,6 @@ catch (TaapiException ex)
 ```
 
 ### Test API Connection
-
 ```csharp
 bool isConnected = await client.TestConnectionAsync();
 Console.WriteLine(isConnected ? "Connection Successful" : "Connection Failed");
@@ -305,7 +387,7 @@ var bulkRequest = new BulkRequest {
 ## Project Structure
 
 - **Core**: Contains models, enums, and default configurations.
-  - **Models**: `IndicatorRequest`, `IndicatorResponse`, `BulkRequest`, `BulkResponse`
+  - **Models**: `IndicatorRequest`, `IndicatorResponse`, `BulkRequest`, `BulkResponse`, `CandleData`, etc.
   - **Enums**: `IndicatorType`, `TimeFrame`, `ExchangeType`, etc.
 - **Services**: Includes the main API client (`TaapiClient`) and supporting classes like `RateLimiter`.
 - **Helpers**: Utility classes for parsing and formatting data.
@@ -359,6 +441,9 @@ If you like this project and you want to support it, you can donate to the follo
 
 ## Changelog
 
+**Version 2.0.1**
+- Fixed that candles were not being fetched correctly in the IndicatorResponse and BulkResponse classes.
 
-#### Version 2.0.0 
-It is totally rewritten from scratch. The library is now more flexible and extensible. It supports multiple indicators and multiple constructs in bulk requests. It has a new error handling system and a new API rate limiter system.
+
+**Version 2.0.0**
+- It is totally rewritten from scratch. The library is now more flexible and extensible. It supports multiple indicators and multiple constructs in bulk requests. It has a new error handling system and a new API rate limiter system.

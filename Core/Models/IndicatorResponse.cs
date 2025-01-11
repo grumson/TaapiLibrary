@@ -6,49 +6,53 @@ namespace TaapiLibrary.Core.Models;
 /// </summary>
 public class IndicatorResponse {
 
-    /// <summary>
-    /// Primary data of the indicator response.
-    /// This is a dictionary where keys are parameter names and values are their respective values.
-    /// </summary>
     public Dictionary<string, object> Data { get; private set; } = new();
 
+    public List<CandleData>? Candles { get; private set; }
 
     /// <summary>
-    /// Parses a raw JSON response from the API into an IndicatorResponse object.
+    /// Deserializes the JSON response from the Taapi.io API into an <see cref="IndicatorResponse"/>.
     /// </summary>
-    /// <param name="jsonResponse">The JSON response from the API as a string.</param>
-    /// <returns>An IndicatorResponse object populated with the API response data.</returns>
-    public static IndicatorResponse FromJson(string jsonResponse) {
+    /// <param name="jsonResponse"></param>
+    /// <param name="indicator"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static IndicatorResponse FromJson(string jsonResponse, string indicator = "") {
 
         if (string.IsNullOrWhiteSpace(jsonResponse)) {
             throw new ArgumentException("Response cannot be null or empty", nameof(jsonResponse));
         }
 
-        // Deserialize the JSON response into a dictionary
-        var parsedResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse);
+        try {
 
-        if (parsedResponse == null) {
-            throw new InvalidOperationException("Failed to parse JSON response.");
+            // Check if the indicator is for candles
+            if (indicator.Equals("candles", StringComparison.OrdinalIgnoreCase)) {
+
+                // Deserialize the JSON array into a list of CandleData
+                var candles = JsonSerializer.Deserialize<List<CandleData>>(jsonResponse);
+
+                return new IndicatorResponse {
+                    Candles = candles ?? new List<CandleData>()
+                };
+            }
+            // If the indicator is not for candles
+            else {
+                // Default behavior for other indicators
+                var parsedResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse);
+
+                if (parsedResponse == null) {
+                    throw new InvalidOperationException("Failed to parse JSON response.");
+                }
+
+                return new IndicatorResponse { Data = parsedResponse };
+            }
+
+        }
+        catch (JsonException ex) {
+            throw new InvalidOperationException("Failed to parse JSON response.", ex);
         }
 
-        return new IndicatorResponse { Data = parsedResponse };
     }//end FromJson()
-
-
-    /// <summary>
-    /// Retrieves a specific parameter value from the response data.
-    /// </summary>
-    /// <param name="key">The parameter key to retrieve.</param>
-    /// <typeparam name="T">The expected type of the value.</typeparam>
-    /// <returns>The value of the parameter if found; otherwise, default value of T.</returns>
-    public T GetValue<T>(string key) {
-
-        if (Data.TryGetValue(key, out var value) && value is T typedValue) {
-            return typedValue;
-        }
-
-        return default!;
-    }//end GetValue()
-
 
 }// class
