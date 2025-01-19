@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TaapiLibrary.Core.Models;
 using TaapiLibrary.Exceptions;
@@ -19,7 +20,7 @@ public static class ErrorHandler {
 
         // Validate the error response
         if (string.IsNullOrWhiteSpace(jsonResponse)) {
-            var errorMessage = "Empty or null error response received.";
+            var errorMessage = "Received an empty or null error response from the API.";
             logger?.LogError(errorMessage);
             throw new TaapiException(errorMessage);
         }
@@ -30,18 +31,28 @@ public static class ErrorHandler {
             var errorResponse = ErrorResponse.FromJson(jsonResponse);
             logger?.LogError("API Error: {ErrorMessage}", errorResponse.Error);
 
-            // Determine specific error type
+            // Log and categorize specific errors
             switch (errorResponse.Error.ToLowerInvariant()) {
-
                 case "rate limit exceeded":
+                    logger?.LogWarning("Rate limit exceeded. Retry after some time.");
                     throw new RateLimitException(errorResponse.Error);
 
                 case "authentication failed":
+                    logger?.LogError("Authentication failed. Please verify the API key.");
                     throw new AuthenticationException(errorResponse.Error);
 
+                case "invalid request":
+                    logger?.LogError("Invalid request sent to API. Verify parameters.");
+                    throw new TaapiException("Invalid request sent to API: " + errorResponse.Error);
+
                 default:
-                    throw new TaapiException(errorResponse.Error);
+                    logger?.LogError("Unknown API error encountered: {ErrorMessage}", errorResponse.Error);
+                    throw new TaapiException("Unknown error: " + errorResponse.Error);
             }
+        }
+        catch (JsonException ex) {
+            logger?.LogError(ex, "Failed to parse API error response JSON.");
+            throw new TaapiException("Invalid JSON format in error response.", ex);
         }
         catch (Exception ex) when (ex is not TaapiException) {
             // Log parsing or unexpected exceptions

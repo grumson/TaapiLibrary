@@ -39,35 +39,33 @@ public class BulkResponse {
             var bulkResponse = new BulkResponse();
 
             foreach (var indicatorElement in dataElement.EnumerateArray()) {
-                var id = indicatorElement.GetProperty("id").GetString() ?? string.Empty;
-                var indicatorType = indicatorElement.GetProperty("indicator").GetString() ?? string.Empty;
+                try {
+                    var id = indicatorElement.GetProperty("id").GetString() ?? string.Empty;
+                    var indicatorType = indicatorElement.GetProperty("indicator").GetString() ?? string.Empty;
 
-                object result;
+                    object result;
 
-                var resultElement = indicatorElement.GetProperty("result");
+                    var resultElement = indicatorElement.GetProperty("result");
 
-                // Handle 'candles' as an array
-                if (indicatorType.Equals("candles", StringComparison.OrdinalIgnoreCase) && resultElement.ValueKind == JsonValueKind.Array) {
-                    result = resultElement.Deserialize<List<CandleData>>() ?? new List<CandleData>();
+                    if (indicatorType.Equals("candles", StringComparison.OrdinalIgnoreCase) && resultElement.ValueKind == JsonValueKind.Array) {
+                        result = resultElement.Deserialize<List<CandleData>>() ?? new List<CandleData>();
+                    }
+                    else if (resultElement.ValueKind == JsonValueKind.Object) {
+                        result = resultElement.EnumerateObject()
+                            .ToDictionary(prop => prop.Name, prop => (object)prop.Value.ToString());
+                    }
+                    else {
+                        throw new InvalidOperationException($"Unexpected 'result' format for indicator {indicatorType}.");
+                    }
+
+                    bulkResponse.Data.Add(new BulkIndicatorResponse {
+                        Id = id,
+                        Result = result
+                    });
                 }
-                // Handle other indicators as objects
-                else if (resultElement.ValueKind == JsonValueKind.Object) {
-                    result = resultElement.EnumerateObject()
-                        .ToDictionary(prop => prop.Name, prop => (object)prop.Value.ToString());
+                catch (Exception ex) {
+                    throw new InvalidOperationException($"Error parsing indicator data: {ex.Message}", ex);
                 }
-                else {
-                    throw new InvalidOperationException($"Unexpected 'result' format for indicator {indicatorType}.");
-                }
-
-                var errors = indicatorElement.TryGetProperty("errors", out var errorsElement) && errorsElement.ValueKind == JsonValueKind.Array
-                    ? errorsElement.EnumerateArray().Select(e => e.GetString() ?? string.Empty).ToList()
-                    : new List<string>();
-
-                bulkResponse.Data.Add(new BulkIndicatorResponse {
-                    Id = id,
-                    Result = result,
-                    Errors = errors
-                });
             }
 
             return bulkResponse;

@@ -82,7 +82,7 @@ public class TaapiClient : ITaapiClient {
             var responseBody = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode) {
-                HandleError(responseBody);
+                HandleError(response, responseBody);
             }
 
             _logger?.LogInformation("Successfully fetched indicator {Indicator} data for {Symbol}.", request.Indicator, request.Symbol);
@@ -145,7 +145,7 @@ public class TaapiClient : ITaapiClient {
             var responseBody = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode) {
-                HandleError(responseBody);
+                HandleError(response, responseBody);
             }
 
             _logger?.LogInformation("Successfully fetched bulk data.");
@@ -208,7 +208,12 @@ public class TaapiClient : ITaapiClient {
     /// Handles API errors by parsing the response and throwing a <see cref="TaapiException"/>.
     /// </summary>
     /// <param name="responseBody">The raw response body from the API.</param>
-    private void HandleError(string responseBody) {
+    private void HandleError(HttpResponseMessage response, string responseBody) {
+
+        _logger?.LogError("HTTP {StatusCode}: {ReasonPhrase}. Response: {ResponseBody}",
+       response.StatusCode,
+       response.ReasonPhrase,
+       responseBody);
 
         ErrorHandler.HandleApiError(responseBody, _logger);
 

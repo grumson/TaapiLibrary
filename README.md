@@ -441,6 +441,9 @@ If you like this project and you want to support it, you can donate to the follo
 
 ## Changelog
 
+**Version 2.0.2**
+-  Improve Error Categorization
+
 **Version 2.0.1**
 - Fixed that candles were not being fetched correctly in the IndicatorResponse and BulkResponse classes.
 
