@@ -6,9 +6,17 @@ namespace TaapiLibrary.Core.Models;
 /// </summary>
 public class IndicatorResponse {
 
+    /// <summary>
+    /// Dictionary of the indicator response data. For single indicator requests.
+    /// </summary>
     public Dictionary<string, object> Data { get; private set; } = new();
 
-    public List<CandleData>? Candles { get; private set; }
+
+    /// <summary>
+    /// List of dictionaries containing the indicator response data. For list of indicators requests.
+    /// </summary>
+    public List<Dictionary<string, object>>? DataList { get; private set; }
+
 
     /// <summary>
     /// Deserializes the JSON response from the Taapi.io API into an <see cref="IndicatorResponse"/>.
@@ -26,28 +34,30 @@ public class IndicatorResponse {
 
         try {
 
-            // Check if the indicator is for candles
-            if (indicator.Equals("candles", StringComparison.OrdinalIgnoreCase)) {
+            var indicatorResponse = new IndicatorResponse();
+            using var document = JsonDocument.Parse(jsonResponse);
+            var root = document.RootElement;
 
-                // Deserialize the JSON array into a list of CandleData
-                var candles = JsonSerializer.Deserialize<List<CandleData>>(jsonResponse);
-
-                return new IndicatorResponse {
-                    Candles = candles ?? new List<CandleData>()
-                };
+            if (root.ValueKind == JsonValueKind.Array) {
+                // Deserialize the JSON array into a list of dictionaries
+                indicatorResponse.DataList = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(jsonResponse)
+                                         ?? new List<Dictionary<string, object>>();
             }
-            // If the indicator is not for candles
-            else {
-                // Default behavior for other indicators
+            else if (root.ValueKind == JsonValueKind.Object) {
+                // Deserialize the JSON object into a dictionary
                 var parsedResponse = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonResponse);
 
                 if (parsedResponse == null) {
                     throw new InvalidOperationException("Failed to parse JSON response.");
                 }
 
-                return new IndicatorResponse { Data = parsedResponse };
+                indicatorResponse.Data = parsedResponse;
+            }
+            else {
+                throw new InvalidOperationException("Unexpected JSON structure: Root element must be an array or object.");
             }
 
+            return indicatorResponse;
         }
         catch (JsonException ex) {
             throw new InvalidOperationException("Failed to parse JSON response.", ex);

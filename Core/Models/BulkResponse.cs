@@ -41,21 +41,22 @@ public class BulkResponse {
             foreach (var indicatorElement in dataElement.EnumerateArray()) {
                 try {
                     var id = indicatorElement.GetProperty("id").GetString() ?? string.Empty;
-                    var indicatorType = indicatorElement.GetProperty("indicator").GetString() ?? string.Empty;
 
                     object result;
-
                     var resultElement = indicatorElement.GetProperty("result");
 
-                    if (indicatorType.Equals("candles", StringComparison.OrdinalIgnoreCase) && resultElement.ValueKind == JsonValueKind.Array) {
-                        result = resultElement.Deserialize<List<CandleData>>() ?? new List<CandleData>();
+                    if (resultElement.ValueKind == JsonValueKind.Array) {
+                        // If result is an array, deserialize into a list of dictionaries
+                        result = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(resultElement.GetRawText())
+                                 ?? new List<Dictionary<string, object>>();
                     }
                     else if (resultElement.ValueKind == JsonValueKind.Object) {
+                        // If result is an object, deserialize into a dictionary
                         result = resultElement.EnumerateObject()
-                            .ToDictionary(prop => prop.Name, prop => (object)prop.Value.ToString());
+                            .ToDictionary(prop => prop.Name, prop => ParseJsonElement(prop.Value));
                     }
                     else {
-                        throw new InvalidOperationException($"Unexpected 'result' format for indicator {indicatorType}.");
+                        throw new InvalidOperationException("Unexpected result format: Must be an array or object.");
                     }
 
                     bulkResponse.Data.Add(new BulkIndicatorResponse {
@@ -75,6 +76,19 @@ public class BulkResponse {
         }
 
     }//end FromJson()
+
+    private static object? ParseJsonElement(JsonElement element) {
+        return element.ValueKind switch {
+            JsonValueKind.String => element.GetString() ?? string.Empty,
+            JsonValueKind.Number => element.TryGetInt64(out var l) ? l : element.GetDouble(),
+            JsonValueKind.True => true,
+            JsonValueKind.False => false,
+            JsonValueKind.Array => element.EnumerateArray().Select(ParseJsonElement).ToList(),
+            JsonValueKind.Object => element.EnumerateObject()
+                .ToDictionary(prop => prop.Name, prop => ParseJsonElement(prop.Value)),
+            _ => null
+        };
+    }
 
     // Notranji razred za deserializacijo odziva API-ja
     private class BulkResponseWrapper {
@@ -101,7 +115,7 @@ public class BulkIndicatorResponse {
     public string Id { get; set; } = string.Empty;
 
     /// <summary>
-    /// The result data of the indicator (can be a dictionary or a list of candles).
+    /// The result data of the indicator (can be a dictionary or a list of dictionary).
     /// </summary>
     public object Result { get; set; } = new();
 

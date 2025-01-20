@@ -115,15 +115,14 @@ try {
 
     var response = await client.GetIndicatorAsync(request);
 
-    Console.WriteLine("Candles Response:");
-    if(response.Candles?.Count > 0) {
-        foreach (var candle in response.Candles) {
-            Console.WriteLine($"Open: {candle.Open}");
-            Console.WriteLine($"High: {candle.High}");
-            Console.WriteLine($"Low: {candle.Low}");
-            Console.WriteLine($"Close: {candle.Close}");
-            Console.WriteLine($"Volume: {candle.Volume}");
-            Console.WriteLine($"Timestamp: {candle.TimestampHuman}");
+    Console.WriteLine("List Response:");
+    if (response.DataList?.Count > 0) {
+        foreach (var data in response.DataList) {
+            if(data?.Count > 0) {
+                foreach (var item in data) {
+                    Console.WriteLine($"{item.Key}: {item.Value}");
+                }
+            }
             Console.WriteLine();
         }
     }
@@ -159,15 +158,24 @@ try
                 Interval = TimeFrame.FourHours.GetDescription(),
                 Indicators = new List<IndicatorDetail>
                 {
-                    new IndicatorDetail { Id = "BTC_rsi", Indicator = "rsi" },
-                    new IndicatorDetail { Id = "BTC_macd", Indicator = "macd" }
+                    new IndicatorDetail { Id = "BTC_Rsi", Indicator = "rsi" },
+                    new IndicatorDetail { Id = "BTC_macd", Indicator = "macd" },
+                    new IndicatorDetail { Id = "BTC_Candles", Indicator = "candles",
+                        AdditionalParameters = new Dictionary<string, string> {
+                            { "period", "10" } // Number of candles
+                        }
+                    },
                 }
             }
         }
     };
+    
+    // Get the bulk indicators data
+    var response = await client.GetBulkAsync(bulkRequest);
 
-    BulkResponse bulkResponse = await client.GetBulkAsync(bulkRequest);
-    foreach (var data in bulkResponse.Data){
+    // Print the response data
+    Console.WriteLine("Bulk Response:");
+    foreach (var data in response.Data) {
 
         // Split the indicator ID to get the symbol and indicator name
         string[] idParts = data.Id.Split('_');
@@ -177,23 +185,22 @@ try
         // Print the symbol and indicator name
         Console.WriteLine($"Symbol: {symbol}, Indicator: {indicator}");
 
-        // Chek if the result is a dictionary or a list of candles
+        // Chek if the result is a dictionary or a list of dictionarys
         if (data.Result is Dictionary<string, object> resultDict) {
             // Process standard indicators
             foreach (var result in resultDict) {
                 Console.WriteLine($"{result.Key}: {result.Value}");
             }
         }
-        else if (data.Result is List<CandleData> candles) {
+        else if (data.Result is List<Dictionary<string, object>> dataList) {
             // Process candles data
-            foreach (var candle in candles) {
-                Console.WriteLine($"Open: {candle.Open}");
-                Console.WriteLine($"High: {candle.High}");
-                Console.WriteLine($"Low: {candle.Low}");
-                Console.WriteLine($"Close: {candle.Close}");
-                Console.WriteLine($"Volume: {candle.Volume}");
-                Console.WriteLine($"Timestamp: {candle.TimestampHuman}");
-                Console.WriteLine();
+            if (dataList.Count > 0) {
+                foreach (var dataItem in dataList) {
+                    foreach (var item in dataItem) {
+                        Console.WriteLine($"{item.Key}: {item.Value}");
+                    }
+                    Console.WriteLine();
+                }
             }
         }
 
@@ -284,16 +291,15 @@ try
                 Console.WriteLine($"{result.Key}: {result.Value}");
             }
         }
-        else if (data.Result is List<CandleData> candles) {
-            // Process candles data
-            foreach (var candle in candles) {
-                Console.WriteLine($"Open: {candle.Open}");
-                Console.WriteLine($"High: {candle.High}");
-                Console.WriteLine($"Low: {candle.Low}");
-                Console.WriteLine($"Close: {candle.Close}");
-                Console.WriteLine($"Volume: {candle.Volume}");
-                Console.WriteLine($"Timestamp: {candle.TimestampHuman}");
-                Console.WriteLine();
+        else if (data.Result is List<Dictionary<string, object>> dataList) {
+            // Print the candles data
+            if (dataList.Count > 0) {
+                foreach (var dataItem in dataList) {
+                    foreach (var item in dataItem) {
+                        Console.WriteLine($"{item.Key}: {item.Value}");
+                    }
+                    Console.WriteLine();
+                }
             }
         }
 
@@ -440,6 +446,10 @@ If you like this project and you want to support it, you can donate to the follo
 ---
 
 ## Changelog
+
+**Version 2.0.3**
+- Change fetch candles to return a list of dictionaries instead of a list of CandlesModel
+
 
 **Version 2.0.2**
 -  Improve Error Categorization
