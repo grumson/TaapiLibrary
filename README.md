@@ -4,7 +4,7 @@
 
 ## Overview
 
-The Taapi class library is a .NET library designed to provide a simple, structured interface for interacting with the [Taapi.io API](https://taapi.io). It supports all of technical indicators, making it an ideal choice for financial applications requiring market analysis. This library also includes advanced features like bulk requests, robust error handling, and Api rate, calculation and construct limit management.
+The Taapi class library is a .NET library designed to provide a simple, structured interface for interacting with the [Taapi.io](https://taapi.io/?ref=13693). It supports all of technical indicators, making it an ideal choice for financial applications requiring market analysis. This library also includes advanced features like bulk requests, robust error handling, and Api rate, calculation and construct limit management.
 
 **Table of Contents**
 - [Features](#features)
@@ -39,6 +39,7 @@ The Taapi class library is a .NET library designed to provide a simple, structur
 - **.NET 8.0 or higher**: Ensure you have .NET SDK installed. You can download it from [Microsoft's official site](https://dotnet.microsoft.com/download).
 - **Taapi.io API Key**: Sign up at [Taapi.io](https://taapi.io/?ref=13693) and obtain an API key for accessing indicators.
 
+### Installation Steps
 
 Add the library to your .NET project using one of the following methods:
 
