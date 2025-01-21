@@ -434,6 +434,8 @@ This project is licensed under the MIT License. See `LICENSE` for more informati
 
 ## Support
 
+Use this link to register on [Taapi.io](https://taapi.io/?ref=13693) and you will support me with a small commission.
+
 If you like this project and you want to support it, you can donate to the following addresses:
 
 **Network BSC BNB smart chain (BEP20)** : 0xd8c509ed7d8f96847618d926e2b831d804e02ece
