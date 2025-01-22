@@ -37,7 +37,7 @@ The Taapi class library is a .NET library designed to provide a simple, structur
 ### Prerequisites
 
 - **.NET 8.0 or higher**: Ensure you have .NET SDK installed. You can download it from [Microsoft's official site](https://dotnet.microsoft.com/download).
-- **Taapi.io API Key**: Sign up at [Taapi.io](https://taapi.io/?ref=13693) and obtain an API key for accessing indicators.
+- **Taapi.io API Key**: Sign up at [Taapi.io](https://taapi.io/?ref=13693) and obtain an API key for accessing indicators. Free version of the API key will probably not work, because of the limitations of the free version of the API key.
 
 ### Installation Steps
 
